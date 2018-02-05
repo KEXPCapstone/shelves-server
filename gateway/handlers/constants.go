@@ -23,3 +23,5 @@ const valAllowMethods = "GET,PUT,POST,PATCH,DELETE,OPTIONS"
 const valAllowHeaders = "Content-Type,Authorization"
 
 const valExposeHeaders = "Authorization"
+
+const valMaxAge = "600"
