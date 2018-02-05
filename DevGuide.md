@@ -6,3 +6,7 @@ Development Guidelines
 * Once a PR has been given a **+1**, it can be merged into master
 
 **Golden Rule: No direct commits to master ever**
+
+Also, be nice to each other
+
+Good luck everyone!
