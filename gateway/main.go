@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/KEXPCapstone/shelves-server/gateway/handlers"
+	"github.com/KEXPCapstone/shelves-server/gateway/sessions"
 	"github.com/go-redis/redis"
-	"github.com/info344-a17/challenges-abourn/servers/gateway/handlers"
-	"github.com/info344-a17/challenges-abourn/servers/gateway/sessions"
 )
 
 func main() {
