@@ -85,3 +85,18 @@ func (hCtx *HandlerCtx) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (hCtx *HandlerCtx) SessionsMineHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		if _, err := sessions.EndSession(r, hCtx.signingKey, hCtx.sessionStore); err != nil {
+			http.Error(w, fmt.Sprintf("Error getting session state: %v", err), http.StatusUnauthorized)
+			return
+		}
+		w.Header().Add(headerContentType, contentTypePlainText)
+		w.Write([]byte("signed out\n"))
+		return
+	} else {
+		http.Error(w, "Only allowed to DELETE from this resource", http.StatusMethodNotAllowed)
+		return
+	}
+}
