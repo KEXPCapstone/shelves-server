@@ -4,7 +4,7 @@ var bcryptCost = 13
 
 //User represents a user account in the database
 type User struct {
-	// ID        bson.ObjectId `json:"id" bson:"_id"`  // TODO: Change, this is something from mongo
+	ID        int    `json:"id"`
 	Email     string `json:"email"`
 	PassHash  []byte `json:"-"` //stored, but not encoded to clients
 	UserName  string `json:"userName"`
