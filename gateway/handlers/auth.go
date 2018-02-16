@@ -86,6 +86,34 @@ func (hCtx *HandlerCtx) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: To be revisited to assess intended authentication method
+func (hCtx *HandlerCtx) SessionsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		cred := &users.Credentials{}
+		if err := json.NewDecoder(r.Body).Decode(cred); err != nil {
+			http.Error(w, fmt.Sprintf("Error decoding JSON of credentials: %v", err), http.StatusBadRequest)
+			return
+		}
+		usr, err := hCtx.userStore.GetByEmail(cred.Email)
+		if err == users.ErrUserNotFound { // maybe check if not nil
+			http.Error(w, "invalid credentials", http.StatusUnauthorized)
+			return
+		}
+		if err := usr.Authenticate(cred.Password); err != nil {
+			http.Error(w, "invalid credentials", http.StatusUnauthorized)
+			return
+		}
+		if _, err := sessions.BeginSession(hCtx.signingKey, hCtx.sessionStore, &SessionState{AuthUsr: usr, StartTime: time.Now()}, w); err != nil {
+			http.Error(w, fmt.Sprintf("Error initiating session: %v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, usr)
+	} else {
+		http.Error(w, "Only allowed to POST to this resource", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 func (hCtx *HandlerCtx) SessionsMineHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodDelete {
 		if _, err := sessions.EndSession(r, hCtx.signingKey, hCtx.sessionStore); err != nil {
