@@ -42,22 +42,22 @@ type Updates struct {
 
 func (nu *NewUser) Validate() error {
 	if _, err := mail.ParseAddress(nu.Email); err != nil {
-		return fmt.Errorf("Email must be a valid email address. Email provided: %v", nu.Email)
+		return fmt.Errorf("%v %v", invalidEmailError, nu.Email)
 	}
 	if len(nu.UserName) == 0 {
-		return fmt.Errorf("UserName cannot be empty. Username provided: %v", nu.UserName)
+		return errors.New(emptyUserNameError)
 	}
 	if len(nu.FirstName) == 0 {
-		return errors.New("First name must be at least 1 character")
+		return errors.New(emptyFirstNameError)
 	}
 	if len(nu.LastName) == 0 {
-		return errors.New("Last name must be at least 1 character")
+		return errors.New(emptyLastNameError)
 	}
 	if len(nu.Password) < 6 {
-		return fmt.Errorf("Password must be at least 6 characters.  Length provided: %v", len(nu.Password))
+		return fmt.Errorf("%v %v", newPasswordLengthError, len(nu.Password))
 	}
 	if nu.Password != nu.PasswordConf {
-		return errors.New("Password confirmation does not match password")
+		return errors.New(newPasswordConfError)
 	}
 	return nil
 }
