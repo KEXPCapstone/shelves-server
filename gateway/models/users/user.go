@@ -100,7 +100,10 @@ func (u *User) SetPassword(password string) error {
 }
 
 func (u *User) Authenticate(password string) error {
-
+	if err := bcrypt.CompareHashAndPassword(u.PassHash, []byte(password)); err != nil {
+		return errors.New("Failed to authenticate; incorrect password")
+	}
+	return nil
 }
 
 func (u *User) ApplyUpdates(updates *Updates) error {}
