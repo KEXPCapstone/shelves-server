@@ -1,9 +1,13 @@
 package users
 
 import (
+	"crypto/md5"
 	"errors"
 	"fmt"
 	"net/mail"
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var bcryptCost = 13
@@ -62,12 +66,41 @@ func (nu *NewUser) Validate() error {
 	return nil
 }
 
-func (nu *NewUser) ToUser() (*User, error) {}
+func (nu *NewUser) ToUser() (*User, error) {
+	if err := nu.Validate(); err != nil {
+		return nil, err
+	}
+	email := strings.TrimSpace(nu.Email)
+	email = strings.ToLower(email)
+	hash := md5.Sum([]byte(email))
+	usr := User{
+		ID:        0, // TODO: Check if this is okay process for inserting a NewUser
+		Email:     email,
+		UserName:  nu.UserName,
+		FirstName: nu.FirstName,
+		LastName:  nu.LastName,
+	}
+	if err := usr.SetPassword(nu.Password); err != nil {
+		return nil, err
+	}
+	return &usr, nil
+}
 
-func (u *User) FullName() string {}
+func (u *User) FullName() string {
+	return strings.Trim(u.FirstName + " " + u.LastName)
+}
 
-func (u *User) SetPassword(password string) error {}
+func (u *User) SetPassword(password string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+	if err != nil {
+		return fmt.Errorf("%v %v", passwordHashError, err)
+	}
+	u.PassHash = hash
+	return nil
+}
 
-func (u *User) Authenticate(password string) error {}
+func (u *User) Authenticate(password string) error {
+
+}
 
 func (u *User) ApplyUpdates(updates *Updates) error {}
