@@ -1,5 +1,11 @@
 package users
 
+import (
+	"errors"
+	"fmt"
+	"net/mail"
+)
+
 var bcryptCost = 13
 
 //User represents a user account in the database
@@ -34,7 +40,27 @@ type Updates struct {
 	LastName  string `json:"lastName"`
 }
 
-func (nu *NewUser) Validate() error {}
+func (nu *NewUser) Validate() error {
+	if _, err := mail.ParseAddress(nu.Email); err != nil {
+		return fmt.Errorf("Email must be a valid email address. Email provided: %v", nu.Email)
+	}
+	if len(nu.UserName) == 0 {
+		return fmt.Errorf("UserName cannot be empty. Username provided: %v", nu.UserName)
+	}
+	if len(nu.FirstName) == 0 {
+		return errors.New("First name must be at least 1 character")
+	}
+	if len(nu.LastName) == 0 {
+		return errors.New("Last name must be at least 1 character")
+	}
+	if len(nu.Password) < 6 {
+		return fmt.Errorf("Password must be at least 6 characters.  Length provided: %v", len(nu.Password))
+	}
+	if nu.Password != nu.PasswordConf {
+		return errors.New("Password confirmation does not match password")
+	}
+	return nil
+}
 
 func (nu *NewUser) ToUser() (*User, error) {}
 
