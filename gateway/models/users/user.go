@@ -14,7 +14,7 @@ var bcryptCost = 13
 
 //User represents a user account in the database
 type User struct {
-	ID        int    `json:"id"`
+	ID        int    `json:"id"` // TODO: Verify the process for User insertion to DB
 	Email     string `json:"email"`
 	PassHash  []byte `json:"-"` //stored, but not encoded to clients
 	UserName  string `json:"userName"`
@@ -101,9 +101,19 @@ func (u *User) SetPassword(password string) error {
 
 func (u *User) Authenticate(password string) error {
 	if err := bcrypt.CompareHashAndPassword(u.PassHash, []byte(password)); err != nil {
-		return errors.New("Failed to authenticate; incorrect password")
+		return errors.New(authenticationFailure)
 	}
 	return nil
 }
 
-func (u *User) ApplyUpdates(updates *Updates) error {}
+// TODO: Revisit, see what updates may be relevant.
+func (u *User) ApplyUpdates(updates *Updates) error {
+	if len(updates.FirstName) == 0 || len(updates.LastName) == 0 {
+		return errors.New(invalidNameUpdate)
+	}
+	u.FirstName = updates.FirstName
+	u.LastName = updates.LastName
+
+	return nil
+}
+}
