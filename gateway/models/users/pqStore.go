@@ -13,14 +13,25 @@ func (ps *PqStore) Insert(nu *NewUser) (*User, error) {
 	// value for id, only pass in the relevant fields to be
 	// added to a row in the database, and then write the
 	// returned id to the User
+	return nil, nil
 }
 
-func (ps *PqStore) GetByID(id int) (*User, error) {}
+func (ps *PqStore) GetByID(id int) (*User, error) {
+	return nil, nil
+}
 
-func (ps *PqStore) GetByEmail(email string) (*User, error) {}
+func (ps *PqStore) GetByEmail(email string) (*User, error) {
+	return nil, nil
+}
 
-func (ps *PqStore) GetByUserName(username string) (*User, error) {}
+func (ps *PqStore) GetByUserName(username string) (*User, error) {
+	return nil, nil
+}
 
-func (ps *PqStore) Update(userID int, updates *Updates) error {}
+func (ps *PqStore) Update(userID int, updates *Updates) error {
+	return nil
+}
 
-func (ps *PqStore) Delete(userID int) error {}
+func (ps *PqStore) Delete(userID int) error {
+	return nil
+}

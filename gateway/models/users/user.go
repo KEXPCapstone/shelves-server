@@ -1,7 +1,6 @@
 package users
 
 import (
-	"crypto/md5"
 	"errors"
 	"fmt"
 	"net/mail"
@@ -72,7 +71,6 @@ func (nu *NewUser) ToUser() (*User, error) {
 	}
 	email := strings.TrimSpace(nu.Email)
 	email = strings.ToLower(email)
-	hash := md5.Sum([]byte(email))
 	usr := User{
 		ID:        0, // TODO: Check if this is okay process for inserting a NewUser
 		Email:     email,
@@ -87,7 +85,7 @@ func (nu *NewUser) ToUser() (*User, error) {
 }
 
 func (u *User) FullName() string {
-	return strings.Trim(u.FirstName + " " + u.LastName)
+	return strings.Trim(u.FirstName+" "+u.LastName, " ")
 }
 
 func (u *User) SetPassword(password string) error {
@@ -115,5 +113,4 @@ func (u *User) ApplyUpdates(updates *Updates) error {
 	u.LastName = updates.LastName
 
 	return nil
-}
 }
