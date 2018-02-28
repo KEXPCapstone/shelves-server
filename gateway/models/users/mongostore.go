@@ -1,10 +1,10 @@
 package users
 
 // implements UserStore interface
-type PqStore struct {
+type MgoStore struct {
 }
 
-func (ps *PqStore) Insert(nu *NewUser) (*User, error) {
+func (ms *MgoStore) Insert(nu *NewUser) (*User, error) {
 	// TODO: Convert nu to an "intermediate user"
 	// Place user into db, returning the associated id
 	// Add the id field into the user?
@@ -16,22 +16,22 @@ func (ps *PqStore) Insert(nu *NewUser) (*User, error) {
 	return nil, nil
 }
 
-func (ps *PqStore) GetByID(id int) (*User, error) {
+func (ms *MgoStore) GetByID(id int) (*User, error) {
 	return nil, nil
 }
 
-func (ps *PqStore) GetByEmail(email string) (*User, error) {
+func (ms *MgoStore) GetByEmail(email string) (*User, error) {
 	return nil, nil
 }
 
-func (ps *PqStore) GetByUserName(username string) (*User, error) {
+func (ms *MgoStore) GetByUserName(username string) (*User, error) {
 	return nil, nil
 }
 
-func (ps *PqStore) Update(userID int, updates *Updates) error {
+func (ms *MgoStore) Update(userID int, updates *Updates) error {
 	return nil
 }
 
-func (ps *PqStore) Delete(userID int) error {
+func (ms *MgoStore) Delete(userID int) error {
 	return nil
 }
