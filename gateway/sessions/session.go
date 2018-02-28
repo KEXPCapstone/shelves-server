@@ -41,6 +41,7 @@ func GetSessionID(r *http.Request, signingKey string) (SessionID, error) {
 	if len(auth) == 0 {
 		return InvalidSessionID, errors.New("could not find auth query string parameter")
 	}
+	// TODO: strings.TrimPrefix instead
 	auth = auth[len(schemeBearer):]
 	sid, err := ValidateID(auth, signingKey)
 	if err != nil {

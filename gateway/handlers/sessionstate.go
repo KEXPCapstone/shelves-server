@@ -1,8 +1,12 @@
 package handlers
 
-import "time"
+import (
+	"time"
+
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
+)
 
 type SessionState struct {
-	// TODO: the AuthUsr
+	AuthUsr   *users.User
 	StartTime time.Time
 }

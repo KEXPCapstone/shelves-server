@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"time"
 
 	"github.com/KEXPCapstone/shelves-server/gateway/handlers"
 	"github.com/KEXPCapstone/shelves-server/gateway/sessions"
-	"github.com/go-redis/redis"
 )
 
 func main() {
@@ -37,11 +35,13 @@ func main() {
 	// TODO: DBADDR
 	// TODO: Microservice ADDRS
 
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: redisAddr,
-	})
-	rs := sessions.NewRedisStore(redisClient, time.Duration(10)*time.Minute)
-	hCtx := handlers.NewHandlerContext()
+	// Commented out because of not being used yet
+	// redisClient := redis.NewClient(&redis.Options{
+	// 	Addr: redisAddr,
+	// })
+
+	// rs := sessions.NewRedisStore(redisClient, time.Duration(10)*time.Minute)
+	// TODO: hCtx := handlers.NewHandlerContext()
 	mux := http.NewServeMux()
 
 	// TODO: Register handlers
@@ -53,4 +53,5 @@ func main() {
 
 func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
 	// TODO`
+	return nil
 }
