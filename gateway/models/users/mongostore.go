@@ -1,7 +1,23 @@
 package users
 
+import mgo "gopkg.in/mgo.v2"
+
 // implements UserStore interface
 type MgoStore struct {
+	session *mgo.Session
+	dbname  string
+	colname string
+}
+
+func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
+	if sess == nil {
+		panic("nil pointer passed from session")
+	}
+	return &MgoStore{
+		session: sess,
+		dbname:  dbName,
+		colname: collectionName,
+	}
 }
 
 func (ms *MgoStore) Insert(nu *NewUser) (*User, error) {
