@@ -26,7 +26,7 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 }
 
 func (ms *MgoStore) Insert(nu *NewUser) (*User, error) {
-	usr, err := newUser.ToUser()
+	usr, err := nu.ToUser()
 	if err != nil {
 		return nil, err
 	}
@@ -67,14 +67,14 @@ func (ms *MgoStore) GetByUserName(username string) (*User, error) {
 
 func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
-	usr, err := ms.GetByID(userID)
+	usr, err := ms.GetByID(id)
 	if err != nil {
 		return err
 	}
 	if err := usr.ApplyUpdates(updates); err != nil {
 		return err
 	}
-	if err := coll.UpdateId(userID, bson.M{"$set": updates}); err != nil {
+	if err := coll.UpdateId(id, bson.M{"$set": updates}); err != nil {
 		return fmt.Errorf("%v : %v", ErrStrUpdateUser, err)
 	}
 	return nil
@@ -82,7 +82,7 @@ func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
 
 func (ms *MgoStore) Delete(id bson.ObjectId) error {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
-	if err := coll.RemoveId(userID); err != nil {
+	if err := coll.RemoveId(id); err != nil {
 		return fmt.Errorf("%v : %v", ErrStrDeleteUser, err)
 	}
 	return nil
