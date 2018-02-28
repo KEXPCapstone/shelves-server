@@ -55,7 +55,12 @@ func (ms *MgoStore) GetByEmail(email string) (*User, error) {
 }
 
 func (ms *MgoStore) GetByUserName(username string) (*User, error) {
-	return nil, nil
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	usr := User{}
+	if err := coll.Find(bson.M{"username": username}).One(&usr); err != nil {
+		return nil, ErrUserNotFound
+	}
+	return &usr, nil
 }
 
 func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
