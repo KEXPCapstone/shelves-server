@@ -1,6 +1,11 @@
 package users
 
-import mgo "gopkg.in/mgo.v2"
+import (
+	"errors"
+
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
 
 // implements UserStore interface
 type MgoStore struct {
@@ -21,18 +26,18 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 }
 
 func (ms *MgoStore) Insert(nu *NewUser) (*User, error) {
-	// TODO: Convert nu to an "intermediate user"
-	// Place user into db, returning the associated id
-	// Add the id field into the user?
-
-	// Alternatively, convert nu to User without a
-	// value for id, only pass in the relevant fields to be
-	// added to a row in the database, and then write the
-	// returned id to the User
-	return nil, nil
+	usr, err := newUser.ToUser()
+	if err != nil {
+		return nil, err
+	}
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.Insert(usr); err != nil {
+		return nil, errors.New("Error inserting user into DB")
+	}
+	return usr, nil
 }
 
-func (ms *MgoStore) GetByID(id int) (*User, error) {
+func (ms *MgoStore) GetByID(id bson.ObjectId) (*User, error) {
 	return nil, nil
 }
 
@@ -44,10 +49,10 @@ func (ms *MgoStore) GetByUserName(username string) (*User, error) {
 	return nil, nil
 }
 
-func (ms *MgoStore) Update(userID int, updates *Updates) error {
+func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
 	return nil
 }
 
-func (ms *MgoStore) Delete(userID int) error {
+func (ms *MgoStore) Delete(id bson.ObjectId) error {
 	return nil
 }
