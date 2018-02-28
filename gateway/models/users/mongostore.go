@@ -1,8 +1,6 @@
 package users
 
 import (
-	"errors"
-
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,7 +14,7 @@ type MgoStore struct {
 
 func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
 	if sess == nil {
-		panic("nil pointer passed from session")
+		panic(NoMgoSess)
 	}
 	return &MgoStore{
 		session: sess,
@@ -32,17 +30,28 @@ func (ms *MgoStore) Insert(nu *NewUser) (*User, error) {
 	}
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.Insert(usr); err != nil {
-		return nil, errors.New("Error inserting user into DB")
+		return nil, ErrInsertUser
 	}
 	return usr, nil
 }
 
 func (ms *MgoStore) GetByID(id bson.ObjectId) (*User, error) {
-	return nil, nil
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	usr := User{}
+	if err := coll.FindId(id).One(&usr); err != nil {
+		return nil, ErrUserNotFound
+	}
+	return &usr, nil
+
 }
 
 func (ms *MgoStore) GetByEmail(email string) (*User, error) {
-	return nil, nil
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	usr := User{}
+	if err := coll.Find(bson.M{"email": email}).One(&usr); err != nil {
+		return nil, ErrUserNotFound
+	}
+	return &usr, nil
 }
 
 func (ms *MgoStore) GetByUserName(username string) (*User, error) {
