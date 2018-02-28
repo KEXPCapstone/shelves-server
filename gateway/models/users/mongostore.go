@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -64,6 +66,19 @@ func (ms *MgoStore) GetByUserName(username string) (*User, error) {
 }
 
 func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	usr, err := ms.GetByID(userID)
+	if err != nil {
+		return err
+	}
+	if err := usr.ApplyUpdates(updates); err != nil {
+		return err
+	}
+
+	if err := coll.UpdateId(userID, bson.M{"$set": updates}); err != nil {
+		return fmt.Errorf("%v %v", ErrStrUpdateUser, err)
+	}
+
 	return nil
 }
 
