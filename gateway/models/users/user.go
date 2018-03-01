@@ -7,18 +7,19 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var bcryptCost = 13
 
 //User represents a user account in the database
 type User struct {
-	ID        int    `json:"id"` // TODO: Verify the process for User insertion to DB
-	Email     string `json:"email"`
-	PassHash  []byte `json:"-"` //stored, but not encoded to clients
-	UserName  string `json:"userName"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	ID        bson.ObjectId `json:"id" bson:"_id"`
+	Email     string        `json:"email"`
+	PassHash  []byte        `json:"-"` //stored, but not encoded to clients
+	UserName  string        `json:"userName"`
+	FirstName string        `json:"firstName"`
+	LastName  string        `json:"lastName"`
 }
 
 //Credentials represents user sign-in credentials
@@ -72,7 +73,7 @@ func (nu *NewUser) ToUser() (*User, error) {
 	email := strings.TrimSpace(nu.Email)
 	email = strings.ToLower(email)
 	usr := User{
-		ID:        0, // TODO: Check if this is okay process for inserting a NewUser
+		ID:        bson.NewObjectId(),
 		Email:     email,
 		UserName:  nu.UserName,
 		FirstName: nu.FirstName,
@@ -111,6 +112,5 @@ func (u *User) ApplyUpdates(updates *Updates) error {
 	}
 	u.FirstName = updates.FirstName
 	u.LastName = updates.LastName
-
 	return nil
 }

@@ -1,8 +1,10 @@
 package users
 
+import "gopkg.in/mgo.v2/bson"
+
 type UserStore interface {
 	//GetByID returns the User with the given ID
-	GetByID(id int) (*User, error)
+	GetByID(id bson.ObjectId) (*User, error)
 
 	//GetByEmail returns the User with the given email
 	GetByEmail(email string) (*User, error)
@@ -15,8 +17,8 @@ type UserStore interface {
 	Insert(newUser *NewUser) (*User, error)
 
 	//Update applies UserUpdates to the given user ID
-	Update(userID int, updates *Updates) error
+	Update(id bson.ObjectId, updates *Updates) error
 
 	//Delete deletes the user with the given ID
-	Delete(userID int) error
+	Delete(id bson.ObjectId) error
 }
