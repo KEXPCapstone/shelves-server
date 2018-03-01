@@ -8,3 +8,14 @@ type MgoStore struct {
 	dbname  string
 	colname string
 }
+
+func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
+	if sess == nil {
+		panic(NoMgoSess)
+	}
+	return &MgoStore{
+		session: sess,
+		dbname:  dbName,
+		colname: collectionName,
+	}
+}
