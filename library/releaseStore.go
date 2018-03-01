@@ -1,6 +1,6 @@
 package library
 
-type LibraryStore interface {
+type ReleaseStore interface {
 
 	// TODO: return single track
 	// Track will have associated release ID
