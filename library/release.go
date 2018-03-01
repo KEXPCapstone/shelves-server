@@ -11,6 +11,7 @@ type Release struct {
 	MusicBrainzInfo MusicBrainzMeta `json:"musicBrainzInfo"`
 	DiscogsURL      string          `json:"discogsURL"`
 	DaletID         string          `json:"daletID"`
+	TrackList       []Track         `json:"trackList"`
 }
 
 type MusicBrainzMeta struct {
