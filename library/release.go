@@ -1,6 +1,10 @@
 package library
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
+)
 
 type Release struct {
 	ID              bson.ObjectId   `json:"id" bson:"_id"`
@@ -12,6 +16,7 @@ type Release struct {
 	DiscogsURL      string          `json:"discogsURL"`
 	DaletID         string          `json:"daletID"`
 	TrackList       []Track         `json:"trackList"`
+	Notes           []Note          `json:"notes"`
 }
 
 type MusicBrainzMeta struct {
@@ -23,4 +28,13 @@ type Track struct {
 	Name      string `json:"name"`
 	Length    string `json:"length"`
 	FCCRating string `json:"FCCRating"`
+}
+
+type Note struct {
+	Author      string        `json:"author"`
+	Comment     string        `json:"comment"`
+	UserID      bson.ObjectId `json:"userID"`
+	DateCreated time.Time     `json:"dateCreated"`
+	// TODO: Decide if editing notes is out of scope or not
+	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
