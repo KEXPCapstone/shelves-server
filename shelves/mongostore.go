@@ -43,7 +43,7 @@ func (ms *MgoStore) GetShelves() ([]*Shelf, error) {
 	shelves := []*Shelf{}
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.Find(nil).All(&shelves); err != nil {
-		return nil, ErrShelfNotFound
+		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
 	}
 	return shelves, nil
 }
@@ -52,7 +52,16 @@ func (ms *MgoStore) GetShelfById(id bson.ObjectId) (*Shelf, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	shelf := &Shelf{}
 	if err := coll.FindId(id).One(shelf); err != nil {
-		return nil, ErrShelfNotFound
+		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
 	}
 	return shelf, nil
+}
+
+func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	shelves := []*Shelf{}
+	if err := coll.Find(bson.M{"OwnerID": userId}).All(&shelves); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
+	}
+	return &shelves, nil
 }
