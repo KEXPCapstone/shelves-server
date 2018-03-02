@@ -37,3 +37,12 @@ func (ms *MgoStore) Insert(ns *NewShelf) (*Shelf, error) {
 	}
 	return shelf, nil
 }
+
+func (ms *MgoStore) GetShelves() ([]*Shelf, error) {
+	shelves := []*Shelf{}
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.Find(nil).All(&shelves); err != nil {
+		return nil, ErrFindShelf
+	}
+	return shelves, nil
+}
