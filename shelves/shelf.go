@@ -17,3 +17,24 @@ type Shelf struct {
 	DateLastEdit time.Time       `json:"dateLastEdit"`
 	Featured     bool            `json:"featured"` // Maybe
 }
+
+type NewShelf struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Featured    bool   `json:"featured"`
+}
+
+func (ns *NewShelf) ToShelf(userID bson.ObjectId) (*Shelf, error) {
+	shelf := Shelf{
+		ID:           bson.NewObjectId(),
+		OwnerID:      userID,
+		Name:         ns.Name,
+		Deleted:      false,
+		ReleaseIDs:   []bson.ObjectId{},
+		Description:  ns.Description,
+		DateCreated:  time.Now(),
+		DateLastEdit: time.Now(),
+		Featured:     ns.Featured,
+	}
+	return &shelf, nil
+}

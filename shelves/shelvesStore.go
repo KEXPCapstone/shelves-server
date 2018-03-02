@@ -9,6 +9,8 @@ type ShelvesStore interface {
 	// "GET /v1/shelves/"
 	GetShelves() error
 
+	Insert() error
+
 	// TODO: return single shelf
 	// "GET /v1/shelves/{id}"
 	GetShelfById(id bson.ObjectId) error
