@@ -24,7 +24,17 @@ type NewShelf struct {
 	Featured    bool   `json:"featured"`
 }
 
+func (ns *NewShelf) Validate() error {
+	if len(ns.Name) == 0 {
+		return ErrEmptyShelfName
+	}
+	return nil
+}
+
 func (ns *NewShelf) ToShelf(userID bson.ObjectId) (*Shelf, error) {
+	if err := ns.Validate(); err != nil {
+		return nil, err
+	}
 	shelf := Shelf{
 		ID:           bson.NewObjectId(),
 		OwnerID:      userID,
