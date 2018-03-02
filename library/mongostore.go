@@ -1,6 +1,9 @@
 package library
 
-import mgo "gopkg.in/mgo.v2"
+import (
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
 
 // implements LibraryStore interface
 type MgoStore struct {
@@ -18,4 +21,8 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 		dbname:  dbName,
 		colname: collectionName,
 	}
+}
+
+func (ms *MgoStore) getReleaseByID(id bson.ObjectId) (*Release, error) {
+
 }
