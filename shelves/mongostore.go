@@ -26,8 +26,7 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
-func (ms *MgoStore) InsertNew(ns *NewShelf) (*Shelf, error) {
-	userId := bson.NewObjectId() // TODO: will need to get userId from sessionState
+func (ms *MgoStore) InsertNew(ns *NewShelf, userId bson.ObjectId) (*Shelf, error) {
 	shelf, err := ns.ToShelf(userId)
 	if err != nil {
 		return nil, err

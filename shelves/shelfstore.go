@@ -4,7 +4,7 @@ import "gopkg.in/mgo.v2/bson"
 
 // TODO: Evaluate correct type of 'id' parameters
 type ShelvesStore interface {
-	InsertNew(ns *NewShelf) (*Shelf, error)
+	InsertNew(ns *NewShelf, userId bson.ObjectId) (*Shelf, error)
 
 	Insert(shelf *Shelf) (*Shelf, error)
 
