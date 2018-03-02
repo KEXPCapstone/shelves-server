@@ -65,3 +65,8 @@ func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 	}
 	return &shelves, nil
 }
+
+// TODO: Evaluate best means of updating; replacing or patching
+func (ms *MgoStore) UpdateShelf(id bson.ObjectId) error {
+	return nil
+}
