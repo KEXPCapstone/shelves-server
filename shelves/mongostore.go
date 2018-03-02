@@ -26,12 +26,16 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
-func (ms *MgoStore) Insert(ns *NewShelf) (*Shelf, error) {
+func (ms *MgoStore) InsertNew(ns *NewShelf) (*Shelf, error) {
 	userId := bson.NewObjectId() // TODO: will need to get userId from sessionState
 	shelf, err := ns.ToShelf(userId)
 	if err != nil {
 		return nil, err
 	}
+	return ms.Insert(shelf)
+}
+
+func (ms *MgoStore) Insert(shelf *Shelf) (*Shelf, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.Insert(shelf); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrInsertShelf, err)
@@ -77,4 +81,19 @@ func (ms *MgoStore) DeleteShelf(id bson.ObjectId) error {
 		return nil, fmt.Errorf("%v %v", ErrDeleteShelf, err)
 	}
 	return nil
+}
+
+func (ms *MgoStore) CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	shelf, err := ms.GetShelfById(id)
+	if err != nil {
+		return nil, err
+	}
+	shelf.ID = bson.NewObjectId()
+	shelf.OwnerID = userId
+	copied, err := ms.Insert(shelf)
+	if err != nil {
+		return nil, err
+	}
+	return copied, nil
 }

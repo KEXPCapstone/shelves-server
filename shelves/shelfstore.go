@@ -4,7 +4,9 @@ import "gopkg.in/mgo.v2/bson"
 
 // TODO: Evaluate correct type of 'id' parameters
 type ShelvesStore interface {
-	Insert(ns *NewShelf) (*Shelf, error)
+	InsertNew(ns *NewShelf) (*Shelf, error)
+
+	Insert(shelf *Shelf) (*Shelf, error)
 
 	// TODO: return array of shelves
 	// "GET /v1/shelves/"
@@ -29,5 +31,6 @@ type ShelvesStore interface {
 	CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, error)
 
 	// TODO: export provided shelf as a folder to Dalet
+	// This should probably be a handler function and not a store function
 	ExportShelf(id bson.ObjectId) error
 }
