@@ -2,11 +2,6 @@ package library
 
 type ReleaseStore interface {
 
-	// TODO: return single track
-	// Track will have associated release ID
-	// "GET /v1/library/tracks/{id}"
-	getTrackById(id int) error
-
 	// TODO: return single release
 	// TODO: decide if release has trackIds or track structs
 	// Release will have associated artist ID
