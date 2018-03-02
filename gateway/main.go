@@ -58,10 +58,14 @@ func main() {
 
 	mongoStore := users.NewMgoStore(mongoSess, "userstore", "users")
 
-	// TODO: hCtx := handlers.NewHandlerContext()
+	hCtx := handlers.NewHandlerContext(sessKey, rs, mongoStore)
 	mux := http.NewServeMux()
 
 	// TODO: Register handlers
+	mux.HandleFunc("/v1/users", hCtx.UsersHandler)
+	mux.HandleFunc("/v1/users/me", hCtx.UsersMeHandler)
+	mux.HandleFunc("/v1/sessions", hCtx.SessionsHandler)
+	mux.HandleFunc("/v1/sessions/mine", hCtx.SessionsMineHandler)
 
 	corsHandler := handlers.NewCorsHandler(mux)
 	fmt.Printf("Server has been started at http://%s\n", addr)
