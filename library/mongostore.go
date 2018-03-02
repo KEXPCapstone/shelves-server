@@ -1,6 +1,8 @@
 package library
 
 import (
+	"errors"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -27,7 +29,7 @@ func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
-		return nil, ErrReleaseNotFound
+		return nil, errors.New(ErrReleaseNotFound)
 	}
 	return release, nil
 }
@@ -36,7 +38,7 @@ func (ms *MgoStore) GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, 
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	releases := []*Release{}
 	if err := coll.Find(bson.M{"KEXPCategory": KEXPCategory}).All(&releases); err != nil {
-		return nil, ErrCategoryNotFound
+		return nil, errors.New(ErrCategoryNotFound)
 	}
 	return releases, nil
 }
