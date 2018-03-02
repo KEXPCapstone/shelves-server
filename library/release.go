@@ -11,6 +11,7 @@ type Release struct {
 	Artist          string          `json:"artist"`
 	Title           string          `json:"title"`
 	ReleaseYear     string          `json:"releaseYear"`
+	KEXPCategory    string          `json:"KEXPCategory"`
 	Label           string          `json:"label"`
 	MusicBrainzInfo MusicBrainzMeta `json:"musicBrainzInfo"`
 	DiscogsURL      string          `json:"discogsURL"`
