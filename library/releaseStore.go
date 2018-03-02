@@ -19,6 +19,7 @@ type ReleaseStore interface {
 	// "GET /v1/library/releases/categories/{cat}"
 	GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error)
 
+	// TODO: Should this be a handler method and not a "store" method?
 	// TODO: Rename method?
 	// TODO: Return a slice of releases which share the criterion with
 	// the given releaseID

@@ -39,5 +39,4 @@ func (ms *MgoStore) GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, 
 		return nil, ErrCategoryNotFound
 	}
 	return releases, nil
-
 }
