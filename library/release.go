@@ -18,6 +18,7 @@ type Release struct {
 	DaletID         string          `json:"daletID"`
 	TrackList       []Track         `json:"trackList"`
 	Notes           []Note          `json:"notes"`
+	// Add image URL?
 }
 
 type MusicBrainzMeta struct {
