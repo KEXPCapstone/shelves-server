@@ -70,3 +70,11 @@ func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 func (ms *MgoStore) UpdateShelf(id bson.ObjectId) error {
 	return nil
 }
+
+func (ms *MgoStore) DeleteShelf(id bson.ObjectId) error {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.RemoveId(id); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrDeleteShelf, err)
+	}
+	return nil
+}
