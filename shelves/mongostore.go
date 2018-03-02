@@ -12,6 +12,7 @@ type MgoStore struct {
 	session *mgo.Session
 	dbname  string
 	colname string
+	// TODO: Maybe just have a field for coll here
 }
 
 func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
@@ -42,7 +43,16 @@ func (ms *MgoStore) GetShelves() ([]*Shelf, error) {
 	shelves := []*Shelf{}
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.Find(nil).All(&shelves); err != nil {
-		return nil, ErrFindShelf
+		return nil, ErrShelfNotFound
 	}
 	return shelves, nil
+}
+
+func (ms *MgoStore) GetShelfById(id bson.ObjectId) (*Shelf, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	shelf := &Shelf{}
+	if err := coll.FindId(id).One(shelf); err != nil {
+		return nil, ErrShelfNotFound
+	}
+	return shelf, nil
 }
