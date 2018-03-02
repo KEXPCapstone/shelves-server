@@ -23,7 +23,7 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
-func (ms *MgoStore) getReleaseByID(id bson.ObjectId) (*Release, error) {
+func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
