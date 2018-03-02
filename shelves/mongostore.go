@@ -66,7 +66,7 @@ func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 	if err := coll.Find(bson.M{"OwnerID": userId}).All(&shelves); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
 	}
-	return &shelves, nil
+	return shelves, nil
 }
 
 // TODO: Evaluate best means of updating; replacing or patching
@@ -77,13 +77,12 @@ func (ms *MgoStore) UpdateShelf(id bson.ObjectId) error {
 func (ms *MgoStore) DeleteShelf(id bson.ObjectId) error {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.RemoveId(id); err != nil {
-		return nil, fmt.Errorf("%v %v", ErrDeleteShelf, err)
+		return fmt.Errorf("%v %v", ErrDeleteShelf, err)
 	}
 	return nil
 }
 
 func (ms *MgoStore) CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	shelf, err := ms.GetShelfById(id)
 	if err != nil {
 		return nil, err

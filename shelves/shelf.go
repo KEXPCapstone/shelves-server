@@ -1,6 +1,7 @@
 package shelves
 
 import (
+	"errors"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -26,7 +27,7 @@ type NewShelf struct {
 
 func (ns *NewShelf) Validate() error {
 	if len(ns.Name) == 0 {
-		return ErrEmptyShelfName
+		return errors.New(ErrEmptyShelfName)
 	}
 	return nil
 }
