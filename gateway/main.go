@@ -6,9 +6,13 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"time"
 
 	"github.com/KEXPCapstone/shelves-server/gateway/handlers"
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/gateway/sessions"
+	"github.com/go-redis/redis"
+	mgo "gopkg.in/mgo.v2"
 )
 
 func main() {
@@ -32,15 +36,28 @@ func main() {
 		log.Fatal("Please provide REDISADDR")
 	}
 
-	// TODO: DBADDR
+	dbAddr := os.Getenv("DBADDR")
+	if len(dbAddr) == 0 {
+		// dbAddr = "localhost:27017"
+		log.Fatal("Please provide DBADDR")
+	}
+
 	// TODO: Microservice ADDRS
 
 	// Commented out because of not being used yet
-	// redisClient := redis.NewClient(&redis.Options{
-	// 	Addr: redisAddr,
-	// })
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisAddr,
+	})
 
-	// rs := sessions.NewRedisStore(redisClient, time.Duration(10)*time.Minute)
+	rs := sessions.NewRedisStore(redisClient, time.Duration(10)*time.Minute)
+
+	mongoSess, err := mgo.Dial(dbAddr)
+	if err != nil {
+		log.Fatalf("Error connecting to MongoDB: %v", err)
+	}
+
+	mongoStore := users.NewMgoStore(mongoSess, "userstore", "users")
+
 	// TODO: hCtx := handlers.NewHandlerContext()
 	mux := http.NewServeMux()
 
