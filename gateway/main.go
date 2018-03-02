@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -58,26 +59,34 @@ func main() {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	librarysvcaddr := os.Getenv("LIBRARYSVCADDR")
-	if len(librarysvcaddr) == 0 {
+	librarySvcAddr := os.Getenv("LIBRARYSVCADDR")
+	if len(librarySvcAddr) == 0 {
 		log.Fatal("Please provide LIBRARYSVCADDR")
 	}
+	splitLibrarySvcAddrs := strings.Split(librarySvcAddr, ",")
 
-	shelvessvcaddr := os.Getenv("SHELVESSVCADDR")
-	if len(shelvessvcaddr) == 0 {
+	shelvesSvcAddr := os.Getenv("SHELVESSVCADDR")
+	if len(shelvesSvcAddr) == 0 {
 		log.Fatal("Please provide SHELVESSVCADDR")
 	}
+	splitShelvesSvcAddrs := strings.Split(shelvesSvcAddr, ",")
 
 	mongoStore := users.NewMgoStore(mongoSess, "userstore", "users")
 
 	hCtx := handlers.NewHandlerContext(sessKey, rs, mongoStore)
 	mux := http.NewServeMux()
 
-	// TODO: Register handlers
 	mux.HandleFunc("/v1/users", hCtx.UsersHandler)
 	mux.HandleFunc("/v1/users/me", hCtx.UsersMeHandler)
 	mux.HandleFunc("/v1/sessions", hCtx.SessionsHandler)
 	mux.HandleFunc("/v1/sessions/mine", hCtx.SessionsMineHandler)
+
+	// TODO: Unsure if we need repetition with the /
+	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
+	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
+	// TODO: May want structure it like /v1/library/release
+	mux.Handle("/v1/library", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
+	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 
 	corsHandler := handlers.NewCorsHandler(mux)
 	fmt.Printf("Server has been started at http://%s\n", addr)
