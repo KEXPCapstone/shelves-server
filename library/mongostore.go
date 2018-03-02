@@ -31,3 +31,7 @@ func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	}
 	return release, nil
 }
+
+func (ms *MgoStore) GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error) {
+
+}

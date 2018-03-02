@@ -17,7 +17,7 @@ type ReleaseStore interface {
 
 	// TODO: Return a slice of releases within provided category
 	// "GET /v1/library/releases/categories/{cat}"
-	GetReleasesByCategory(category string) ([]*Release, error)
+	GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error)
 
 	// TODO: Rename method?
 	// TODO: Return a slice of releases which share the criterion with
