@@ -9,7 +9,6 @@ type HandlerCtx struct {
 	signingKey   string
 	sessionStore sessions.Store
 	userStore    users.UserStore
-
 	// TODO
 }
 
