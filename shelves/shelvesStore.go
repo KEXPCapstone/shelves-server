@@ -9,11 +9,11 @@ type ShelvesStore interface {
 	// "GET /v1/shelves/"
 	GetShelves() error
 
-	Insert() error
+	Insert(ns *NewShelf) (*Shelf, error)
 
 	// TODO: return single shelf
 	// "GET /v1/shelves/{id}"
-	GetShelfById(id bson.ObjectId) error
+	GetShelfById(id bson.ObjectId) (*Shelf, error)
 
 	// TODO: Will accept a typeof 'Shelf' and replace exisiting shelf
 	// at id with that new Shelf
@@ -25,7 +25,7 @@ type ShelvesStore interface {
 
 	// TODO: create and return copy of shelf with given id
 	// TODO: Create resource path for this function
-	CopyShelf(id bson.ObjectId, userId bson.ObjectId) error
+	CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, error)
 
 	// TODO: export provided shelf as a folder to Dalet
 	ExportShelf(id bson.ObjectId) error
