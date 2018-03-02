@@ -58,6 +58,16 @@ func main() {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
+	librarysvcaddr := os.Getenv("LIBRARYSVCADDR")
+	if len(librarysvcaddr) == 0 {
+		log.Fatal("Please provide LIBRARYSVCADDR")
+	}
+
+	shelvessvcaddr := os.Getenv("SHELVESSVCADDR")
+	if len(shelvessvcaddr) == 0 {
+		log.Fatal("Please provide SHELVESSVCADDR")
+	}
+
 	mongoStore := users.NewMgoStore(mongoSess, "userstore", "users")
 
 	hCtx := handlers.NewHandlerContext(sessKey, rs, mongoStore)
