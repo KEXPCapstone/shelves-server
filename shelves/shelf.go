@@ -1,1 +1,19 @@
 package shelves
+
+import (
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
+)
+
+type Shelf struct {
+	ID           bson.ObjectId   `json:"id" bson:"_id"`
+	OwnerID      bson.ObjectId   `json:"ownerId"` // TODO: May have to also add bson tag here
+	Name         string          `json:"name"`
+	Deleted      bool            `json:"-"` // store, but don't encode
+	ReleaseIDs   []bson.ObjectId `json:"releaseIDs"`
+	Description  string          `json:"description"` // Maybe
+	DateCreated  time.Time       `json:"dateCreated"`
+	DateLastEdit time.Time       `json:"dateLastEdit"`
+	Featured     bool            `json:"featured"` // Maybe
+}
