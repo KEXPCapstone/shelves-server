@@ -21,3 +21,11 @@ const authenticationFailure = "Failed to authenticate; incorrect password."
 const invalidNameUpdate = "Invalid update: first name and last name must be at least 1 character"
 
 var ErrUserNotFound = errors.New("user not found")
+
+var ErrInsertUser = errors.New("Error inserting user into DB")
+
+var NoMgoSess = "nil pointer passed from session to mongo"
+
+var ErrStrUpdateUser = "Error returned when updating user"
+
+var ErrStrDeleteUser = "Error returned when deleting user"
