@@ -45,8 +45,6 @@ func main() {
 		log.Fatal("Please provide DBADDR")
 	}
 
-	// TODO: Microservice ADDRS
-
 	// Commented out because of not being used yet
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: redisAddr,

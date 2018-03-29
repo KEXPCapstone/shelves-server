@@ -1,4 +1,4 @@
-package shelves
+package main
 
 import (
 	"fmt"
