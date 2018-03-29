@@ -1,4 +1,4 @@
-package shelves
+package main
 
 const ErrEmptyShelfName = "Shelf must have a name"
 
