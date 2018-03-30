@@ -5,5 +5,6 @@ export TLSKEY=$(GOPATH)/src/github.com/KEXPCapstone/shelves-server/tls/privkey.p
 export REDISADDR=localhost:6379
 export SESSIONKEY=password
 export DBADDR=localhost:27017
-
+export LIBRARYSVCADDR=localhost:4001
+export SHELVESSVCADDR=localhost:4002
 go install && gateway
