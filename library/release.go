@@ -72,3 +72,18 @@ type Note struct {
 	// TODO: Decide if editing notes is out of scope or not
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
+
+func (dr *DaletRelease) ProcessDaletRelease() (*Release, error) {
+	/*
+		1). Load in Data from Dalet into DaletRelease
+			a). Handle scenarios of missing data.
+		2). Fetch data from MusicBrainz
+			a). Producers
+			b). Building track lists?
+			c). Any other fields
+		3). Copy fields into Release struct with associated BSON ID
+		4). Place Release into Mongo.
+	*/
+
+	return nil, nil
+}
