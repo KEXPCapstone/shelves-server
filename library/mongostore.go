@@ -34,10 +34,10 @@ func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	return release, nil
 }
 
-func (ms *MgoStore) GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error) {
+func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	releases := []*Release{}
-	if err := coll.Find(bson.M{"KEXPCategory": KEXPCategory}).All(&releases); err != nil {
+	if err := coll.Find(bson.M{field: value}).All(&releases); err != nil {
 		return nil, errors.New(ErrCategoryNotFound)
 	}
 	return releases, nil

@@ -17,7 +17,7 @@ type ReleaseStore interface {
 
 	// TODO: Return a slice of releases within provided category
 	// "GET /v1/library/releases/categories/{cat}"
-	GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error)
+	GetReleasesByField(field string, value string)
 
 	// TODO: Should this be a handler method and not a "store" method?
 	// TODO: Rename method?
