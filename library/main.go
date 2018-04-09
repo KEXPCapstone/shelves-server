@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	mgo "gopkg.in/mgo.v2"
 )
 
 func main() {
@@ -12,6 +14,19 @@ func main() {
 		addr = ":80"
 	}
 	mux := http.NewServeMux()
+
+	dbAddr := os.Getenv("DBADDR")
+	if len(dbAddr) == 0 {
+		// dbAddr = "localhost:27017"
+		log.Fatal("Please provide DBADDR")
+	}
+
+	mongoSess, err := mgo.Dial(dbAddr)
+	if err != nil {
+		log.Fatalf("Error connecting to MongoDB: %v", err)
+	}
+
+	mongoStore := NewMgoStore(mongoSess, "releasestore", "releases")
 
 	// TODO: Register handlers on mux
 
