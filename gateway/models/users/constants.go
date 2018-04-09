@@ -29,3 +29,7 @@ var NoMgoSess = "nil pointer passed from session to mongo"
 var ErrStrUpdateUser = "Error returned when updating user"
 
 var ErrStrDeleteUser = "Error returned when deleting user"
+
+var ErrCategoryNotFound = "Could not find category"
+
+var ErrCouldNotFindReleases = "Could not find releases"

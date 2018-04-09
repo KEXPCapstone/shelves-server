@@ -3,6 +3,7 @@ package main
 import "gopkg.in/mgo.v2/bson"
 
 type ReleaseStore interface {
+	GetAllReleases() ([]*Release, error)
 
 	// TODO: return single release
 	// TODO: decide if release has trackIds or track structs
@@ -17,5 +18,5 @@ type ReleaseStore interface {
 
 	// TODO: Return a slice of releases within provided category
 	// "GET /v1/library/releases/categories/{cat}"
-	GetReleasesByField(field string, value string)
+	GetReleasesByField(field string, value string) ([]*Release, error)
 }

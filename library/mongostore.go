@@ -25,6 +25,15 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
+func (ms *MgoStore) GetAllReleases() ([]*Release, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	releases := []*Release{}
+	if err := coll.Find(nil).All(&releases); err != nil {
+		return nil, errors.New(ErrCouldNotFindReleases)
+	}
+	return releases, nil
+}
+
 func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	release := &Release{}
