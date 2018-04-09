@@ -35,12 +35,9 @@ func main() {
 }
 
 // TODO: Implement handler function
-func InsertHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func GetAllHandler(w http.ResponseWriter, r *http.Request) {
-
+func ReleasesHandler(w http.ResponseWriter, r *http.Request) {
+	// GetAll
+	// Insert
 }
 
 func GetByIDHandler(w http.ResponseWriter, r *http.Request) {
