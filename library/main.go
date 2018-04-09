@@ -40,7 +40,7 @@ func ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	// Insert
 }
 
-func GetByIDHandler(w http.ResponseWriter, r *http.Request) {
+func SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
