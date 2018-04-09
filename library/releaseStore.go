@@ -3,6 +3,8 @@ package main
 import "gopkg.in/mgo.v2/bson"
 
 type ReleaseStore interface {
+	Insert(release *Release) error
+
 	GetAllReleases() ([]*Release, error)
 
 	// TODO: return single release

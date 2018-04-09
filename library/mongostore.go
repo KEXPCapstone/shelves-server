@@ -25,6 +25,15 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
+func (ms *MgoStore) Insert(release *Release) error {
+	// TODO: Change parameter to something like "New Release", and then call validation methods
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.Insert(release); err != nil {
+		return errors.New(ErrInsertRelease) // Include the mongo message as well?
+	}
+	return nil
+}
+
 func (ms *MgoStore) GetAllReleases() ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	releases := []*Release{}

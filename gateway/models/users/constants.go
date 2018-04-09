@@ -33,3 +33,5 @@ var ErrStrDeleteUser = "Error returned when deleting user"
 var ErrCategoryNotFound = "Could not find category"
 
 var ErrCouldNotFindReleases = "Could not find releases"
+
+var ErrInsertRelease = "Error returned when inserting release"
