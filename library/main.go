@@ -29,6 +29,8 @@ func main() {
 	mongoStore := NewMgoStore(mongoSess, "releasestore", "releases")
 
 	// TODO: Register handlers on mux
+	mux.HandleFunc("/v1/library/releases", ReleasesHandler)
+	mux.HandleFunc("/v1/library/releases/", SingleReleaseHandler)
 
 	log.Printf("Library microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))
@@ -37,6 +39,7 @@ func main() {
 // TODO: Implement handler function
 func ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	// GetAll
+	// GetByField
 	// Insert
 }
 
@@ -44,6 +47,7 @@ func SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Delete?
 func GetByFieldHandler(w http.ResponseWriter, r *http.Request) {
 
 }
