@@ -28,6 +28,7 @@ func main() {
 
 	mongoStore := NewMgoStore(mongoSess, "releasestore", "releases")
 
+	hCtx := NewHandlerContext(mongoStore)
 	// TODO: Register handlers on mux
 	mux.HandleFunc("/v1/library/releases", ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", SingleReleaseHandler)

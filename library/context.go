@@ -6,6 +6,6 @@ type HandlerCtx struct {
 
 func NewHandlerContext(rs ReleaseStore) *HandlerCtx {
 	return &HandlerCtx{
-		releaseStore: rs
+		releaseStore: rs,
 	}
 }
