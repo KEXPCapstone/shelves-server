@@ -30,33 +30,9 @@ func main() {
 
 	hCtx := NewHandlerContext(mongoStore)
 	// TODO: Register handlers on mux
-	mux.HandleFunc("/v1/library/releases", ReleasesHandler)
-	mux.HandleFunc("/v1/library/releases/", SingleReleaseHandler)
+	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
+	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
 
 	log.Printf("Library microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))
-}
-
-// TODO: Implement handler function
-func ReleasesHandler(w http.ResponseWriter, r *http.Request) {
-	// GetAll
-	// GetByField
-	// Insert
-	field := r.URL.Query().Get("field")
-	value := r.URL.Query().Get("value")
-
-	switch r.Method {
-	case http.MethodPost:
-		// insert 
-	case http.MethodGet:
-		if len(field) != 0 && len(value) != 0 {
-			// mongo filter
-		} else {
-			// get all 
-		}
-
-}
-
-func SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
-
 }
