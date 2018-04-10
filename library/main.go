@@ -46,8 +46,3 @@ func ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 func SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
 
 }
-
-// Delete?
-func GetByFieldHandler(w http.ResponseWriter, r *http.Request) {
-
-}
