@@ -12,8 +12,6 @@ ssh root@api.kexpshelves.com << HERE
 	docker rm -f library
 	docker rm -f gateway
 	docker rm -f redissvr
-	docker network rm dylan
-	docker network create dylan
 	docker run -d --name redissvr --network dylan redis
 	docker run -d --name mongodb -v /srv/data:/data/seeds --network dylan mongo
 	docker pull kexpcapstone/shelves
