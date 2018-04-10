@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"path"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // TODO: Implement handler function
@@ -39,5 +42,17 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
-
+	releaseID := path.Base(r.URL.String())
+	if !bson.IsObjectIdHex(releaseID) {
+		// TODO: invalid
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		release, err := hCtx.releaseStore.GetReleaseByID(releaseID)
+		if err != nil {
+			// TODO
+		}
+		// respond with release
+	}
 }
