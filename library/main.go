@@ -13,23 +13,31 @@ import (
 func main() {
 	addr := os.Getenv("ADDR")
 	if len(addr) == 0 {
-		// addr = ":80"
-		addr = "localhost:4001"
+		addr = ":80"
+		// addr = "localhost:4001"
 	}
 	mux := http.NewServeMux()
 
 	dbAddr := os.Getenv("DBADDR")
 	if len(dbAddr) == 0 {
-		dbAddr = "localhost:27017"
-		// log.Fatal("Please provide DBADDR")
+		// dbAddr = "localhost:27017"
+		log.Fatal("Please provide DBADDR")
 	}
 
+	releaseDb := os.Getenv("RELEASEDB")
+	if len(releaseDb) == 0 {
+		log.Fatal("Please provide RELEASEDB")
+	}
+	releaseColl := os.Getenv("RELEASECOLL")
+	if len(releaseColl) == 0 {
+		log.Fatal("Please provide RELEASECOLL")
+	}
 	mongoSess, err := mgo.Dial(dbAddr)
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := releases.NewMgoStore(mongoSess, "releasestore", "releases")
+	mongoStore := releases.NewMgoStore(mongoSess, releaseDb, releaseColl)
 
 	hCtx := handlers.NewHandlerContext(mongoStore)
 
