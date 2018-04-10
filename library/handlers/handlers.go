@@ -9,7 +9,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// TODO: Implement handler function
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	field := r.URL.Query().Get("field")
 	value := r.URL.Query().Get("value")
@@ -42,6 +41,9 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 			}
 			respond(w, http.StatusOK, releases)
 		}
+	default:
+		http.Error(w, ReleasesHandlerInvalidMethod, http.StatusMethodNotAllowed)
+		return
 	}
 }
 
@@ -59,5 +61,8 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		respond(w, http.StatusOK, release)
+	default:
+		http.Error(w, SingleReleaseHandlerInvalidMethod, http.StatusMethodNotAllowed)
+		return
 	}
 }
