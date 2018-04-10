@@ -19,7 +19,13 @@ ssh root@api.kexpshelves.com << HERE
 	docker pull kexpcapstone/shelves
 	docker pull kexpcapstone/library
 	docker run -d --name shelves --network dylan -e DBADDR=mongodb:27017 kexpcapstone/shelves
-	docker run -d --name library --network dylan -e DBADDR=mongodb:27017 kexpcapstone/library
+	docker run -d \ 
+	--name library \ 
+	-e DBADDR=mongodb:27017 \
+	-e RELEASEDB=library \
+	-e RELEASECOLL=releases \
+	--network dylan \
+	kexpcapstone/library
 	docker pull kexpcapstone/gateway
 	docker run -d \
 	-p 443:443 \
