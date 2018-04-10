@@ -25,7 +25,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, fmt.Sprintf(ErrInsertRelease+"%v", err), http.StatusInternalServerError)
 			return
 		}
-		// respond
+		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
 		if len(field) != 0 && len(value) != 0 {
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
@@ -33,14 +33,14 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 				return
 			}
-			// respond
+			respond(w, http.StatusOK, releases)
 		} else {
 			releases, err := hCtx.releaseStore.GetAllReleases()
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 				return
 			}
-			// respond
+			respond(w, http.StatusOK, releases)
 		}
 	}
 }
@@ -58,6 +58,6 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 			return
 		}
-		// respond with release
+		respond(w, http.StatusOK, release)
 	}
 }
