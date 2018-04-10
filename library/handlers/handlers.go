@@ -3,9 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -15,7 +17,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 
 	switch r.Method {
 	case http.MethodPost:
-		release := &Release{}
+		release := &releases.Release{}
 		if err := json.NewDecoder(r.Body).Decode(release); err != nil {
 			http.Error(w, fmt.Sprintf(ErrDecodingJSON+"%v", err), http.StatusBadRequest)
 			return
@@ -27,6 +29,8 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
 		if len(field) != 0 && len(value) != 0 {
+			log.Println(field)
+			log.Println(value)
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
@@ -53,9 +57,10 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, ErrInvalidReleaseID, http.StatusBadRequest)
 		return
 	}
+	releaseIDBson := bson.ObjectIdHex(releaseID)
 	switch r.Method {
 	case http.MethodGet:
-		release, err := hCtx.releaseStore.GetReleaseByID(releaseID)
+		release, err := hCtx.releaseStore.GetReleaseByID(releaseIDBson)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 			return

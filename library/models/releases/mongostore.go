@@ -1,8 +1,6 @@
 package releases
 
 import (
-	"errors"
-
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -29,7 +27,7 @@ func (ms *MgoStore) Insert(release *Release) error {
 	// TODO: Change parameter to something like "New Release", and then call validation methods
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.Insert(release); err != nil {
-		return errors.New(ErrInsertRelease) // Include the mongo message as well?
+		return err
 	}
 	return nil
 }
@@ -38,7 +36,7 @@ func (ms *MgoStore) GetAllReleases() ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	releases := []*Release{}
 	if err := coll.Find(nil).All(&releases); err != nil {
-		return nil, errors.New(ErrCouldNotFindReleases)
+		return nil, err
 	}
 	return releases, nil
 }
@@ -47,7 +45,7 @@ func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
-		return nil, errors.New(ErrReleaseNotFound)
+		return nil, err
 	}
 	return release, nil
 }
@@ -56,7 +54,7 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	releases := []*Release{}
 	if err := coll.Find(bson.M{field: value}).All(&releases); err != nil {
-		return nil, errors.New(ErrCategoryNotFound)
+		return nil, err
 	}
 	return releases, nil
 }
