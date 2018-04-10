@@ -1,8 +1,11 @@
-package main
+package releases
 
 import "gopkg.in/mgo.v2/bson"
 
 type ReleaseStore interface {
+	Insert(release *Release) error
+
+	GetAllReleases() ([]*Release, error)
 
 	// TODO: return single release
 	// TODO: decide if release has trackIds or track structs
@@ -17,14 +20,5 @@ type ReleaseStore interface {
 
 	// TODO: Return a slice of releases within provided category
 	// "GET /v1/library/releases/categories/{cat}"
-	GetReleasesByKEXPCategory(KEXPCategory string) ([]*Release, error)
-
-	// TODO: Should this be a handler method and not a "store" method?
-	// TODO: Rename method?
-	// TODO: Return a slice of releases which share the criterion with
-	// the given releaseID
-	// TODO: "SELECT * FROM Releases WHERE criterion == criterion" with
-	// a switch on criterion
-	// "GET /v1/releases/related/{id}"
-	GetRelatedReleasesByReleaseId(id bson.ObjectId, criterion string) ([]*Release, error)
+	GetReleasesByField(field string, value string) ([]*Release, error)
 }
