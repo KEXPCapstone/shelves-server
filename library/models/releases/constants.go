@@ -1,4 +1,4 @@
-package main
+package releases
 
 var NoMgoSess = "nil pointer passed from session to Mongo"
 

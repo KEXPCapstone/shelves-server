@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/KEXPCapstone/shelves-server/library/handlers"
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -26,9 +28,9 @@ func main() {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := NewMgoStore(mongoSess, "releasestore", "releases")
+	mongoStore := releases.NewMgoStore(mongoSess, "releasestore", "releases")
 
-	hCtx := NewHandlerContext(mongoStore)
+	hCtx := handlers.NewHandlerContext(mongoStore)
 	// TODO: Register handlers on mux
 	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
