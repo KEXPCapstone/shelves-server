@@ -30,7 +30,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
-		if len(field) != 0 && len(value) != 0 && len(q) == 0 {
+		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
 			log.Println(field)
 			log.Println(value)
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
@@ -39,11 +39,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 				return
 			}
 			respond(w, http.StatusOK, releases)
-		} else if len(q) != 0 {
-			if len(searchTerm) == 0 {
-				respond(w, http.StatusOK, &[]releases.Release{}) // return empty json if q is empty
-				return
-			}
+		} else if len(searchTerm) != 0 {
 			searchTerm = strings.ToLower(searchTerm)
 			foundReleaseIDs := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
 			foundReleases, err := hCtx.releaseStore.GetReleasesBySliceObjectIDs(foundReleaseIDs)
@@ -53,7 +49,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 			}
 			respond(w, http.StatusOK, foundReleases)
 
-		} else {
+		} else { // What if we want to show results as user types? If searchTerm == 0, then all results are returned
 			releases, err := hCtx.releaseStore.GetAllReleases()
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
