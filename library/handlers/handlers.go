@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"gopkg.in/mgo.v2/bson"
@@ -14,6 +15,7 @@ import (
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	field := r.URL.Query().Get("field")
 	value := r.URL.Query().Get("value")
+	searchTerm := r.URL.Query().Get("q")
 
 	switch r.Method {
 	case http.MethodPost:
@@ -28,7 +30,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
-		if len(field) != 0 && len(value) != 0 {
+		if len(field) != 0 && len(value) != 0 && len(q) == 0 {
 			log.Println(field)
 			log.Println(value)
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
@@ -37,6 +39,14 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 				return
 			}
 			respond(w, http.StatusOK, releases)
+		} else if len(q) != 0 {
+			if len(searchTerm) == 0 {
+				respond(w, http.StatusOK, &[]releases.Release{}) // return empty json if q is empty
+				return
+			}
+			// search the trie
+			searchTerm = strings.ToLower(searchTerm)
+
 		} else {
 			releases, err := hCtx.releaseStore.GetAllReleases()
 			if err != nil {
