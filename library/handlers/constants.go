@@ -17,3 +17,7 @@ const SingleReleaseHandlerInvalidMethod = "Only GET requests are allowed for thi
 const headerContentType = "Content-Type"
 
 const contentTypeJSON = "application/json"
+
+const maxSearchResults = 100
+
+const ErrorSearching = "Error processing release results: "

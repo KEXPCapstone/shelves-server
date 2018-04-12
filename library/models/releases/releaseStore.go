@@ -21,4 +21,6 @@ type ReleaseStore interface {
 	// TODO: Return a slice of releases within provided category
 	// "GET /v1/library/releases/categories/{cat}"
 	GetReleasesByField(field string, value string) ([]*Release, error)
+
+	GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*Release, error)
 }

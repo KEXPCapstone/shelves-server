@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/KEXPCapstone/shelves-server/library/handlers"
+	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	mgo "gopkg.in/mgo.v2"
 )
@@ -39,7 +40,8 @@ func main() {
 
 	mongoStore := releases.NewMgoStore(mongoSess, releaseDb, releaseColl)
 
-	hCtx := handlers.NewHandlerContext(mongoStore)
+	releaseTrie := indexes.CreateTrieRoot()
+	hCtx := handlers.NewHandlerContext(mongoStore, releaseTrie)
 
 	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)

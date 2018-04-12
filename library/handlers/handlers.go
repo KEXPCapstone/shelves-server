@@ -44,8 +44,14 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 				respond(w, http.StatusOK, &[]releases.Release{}) // return empty json if q is empty
 				return
 			}
-			// search the trie
 			searchTerm = strings.ToLower(searchTerm)
+			foundReleaseIDs := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
+			foundReleases, err := hCtx.releaseStore.GetReleasesBySliceObjectIDs(foundReleaseIDs)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
+				return
+			}
+			respond(w, http.StatusOK, foundReleases)
 
 		} else {
 			releases, err := hCtx.releaseStore.GetAllReleases()
