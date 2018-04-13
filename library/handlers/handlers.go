@@ -41,8 +41,8 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 			respond(w, http.StatusOK, releases)
 		} else if len(searchTerm) != 0 {
 			searchTerm = strings.ToLower(searchTerm)
-			foundReleaseIDs := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
-			foundReleases, err := hCtx.releaseStore.GetReleasesBySliceObjectIDs(foundReleaseIDs)
+			searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
+			foundReleases, err := hCtx.releaseStore.GetReleasesBySliceSearchResults(searchResults)
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
 				return

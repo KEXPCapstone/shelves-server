@@ -25,7 +25,7 @@ type ReleaseStore interface {
 	// "GET /v1/library/releases/categories/{cat}"
 	GetReleasesByField(field string, value string) ([]*Release, error)
 
-	GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*Release, error)
+	GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*Release, error)
 
 	IndexReleases() (*indexes.TrieNode, error)
 }

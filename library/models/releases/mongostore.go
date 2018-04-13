@@ -62,7 +62,7 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 	return releases, nil
 }
 
-func (ms *MgoStore) GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*Release, error) {
+func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*Release, error) {
 	// TODO
 	return nil, nil
 }
