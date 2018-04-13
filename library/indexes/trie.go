@@ -56,14 +56,14 @@ func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) 
 	return false
 }
 
-func (t *TrieNode) SearchReleases(prefix string, maxResults int) []bson.ObjectId {
+func (t *TrieNode) SearchReleases(prefix string, maxResults int) []SearchResult {
 	t.mx.RLock()
 	defer t.mx.RUnlock()
 	startNode, err := t.searchPrefixForNode(prefix)
 	if err != nil {
-		return []bson.ObjectId{}
+		return []SearchResult{}
 	}
-	return t.findResultsFromPrefix(startNode, maxResults, []bson.ObjectId{}, make(map[bson.ObjectId]bool))
+	return t.findResultsFromPrefix(startNode, maxResults, []SearchResult{}, make(map[bson.ObjectId]bool))
 }
 
 func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
@@ -79,12 +79,12 @@ func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 	return curr, nil
 }
 
-func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []bson.ObjectId, idsInResults map[bson.ObjectId]bool) []bson.ObjectId {
-	for _, id := range node.ReleaseIDs {
-		_, ok := idsInResults[id]
+func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []SearchResult, idsInResults map[bson.ObjectId]bool) []SearchResult {
+	for _, searchResult := range node.SearchResults {
+		_, ok := idsInResults[searchResult.ReleaseID]
 		if len(results) < maxResults && !ok {
-			idsInResults[id] = true
-			results = append(results, id)
+			idsInResults[searchResult.ReleaseID] = true
+			results = append(results, searchResult)
 		} else {
 			return results
 		}
