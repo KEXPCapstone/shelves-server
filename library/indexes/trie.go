@@ -42,7 +42,7 @@ func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
 		curr = child
 	}
 	if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
-		curr.SearchResults = append(curr.SearchResults, SearchResult)
+		curr.SearchResults = append(curr.SearchResults, searchResult)
 	}
 	t.mx.Unlock()
 }

@@ -1,6 +1,8 @@
 package releases
 
 import (
+	"strings"
+
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -71,7 +73,7 @@ func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
 	release := Release{}
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
-		//t.AddToTrie the match criteria struct
+		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
 	}
 
 	if err := iter.Close(); err != nil {
