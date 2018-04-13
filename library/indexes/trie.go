@@ -10,14 +10,14 @@ import (
 )
 
 type TrieNode struct {
-	Key         rune
-	Children    map[rune]*TrieNode
-	SearchValue SearchValue
-	Parent      *TrieNode
-	mx          sync.RWMutex
+	Key           rune
+	Children      map[rune]*TrieNode
+	SearchResults []SearchResult
+	Parent        *TrieNode
+	mx            sync.RWMutex
 }
 
-type SearchValue struct {
+type SearchResult struct {
 	ReleaseID      bson.ObjectId `json:"releaseID"`
 	FieldMatchedOn string        `json:"fieldMatchedOn"`
 }
@@ -26,7 +26,7 @@ func CreateTrieRoot() *TrieNode {
 	return &TrieNode{Children: make(map[rune]*TrieNode)}
 }
 
-func (t *TrieNode) AddToTrie(prefix string, releaseID bson.ObjectId) {
+func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
 	t.mx.Lock()
 	curr := t
 	for _, char := range prefix {
@@ -41,15 +41,15 @@ func (t *TrieNode) AddToTrie(prefix string, releaseID bson.ObjectId) {
 		}
 		curr = child
 	}
-	if !t.nodeContainsRelease(curr, releaseID) {
-		curr.ReleaseIDs = append(curr.ReleaseIDs, releaseID)
+	if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
+		curr.SearchResults = append(curr.SearchResults, SearchResult)
 	}
 	t.mx.Unlock()
 }
 
 func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) bool {
-	for _, val := range node.ReleaseIDs {
-		if val == releaseID {
+	for _, val := range node.SearchResults {
+		if val.ReleaseID == releaseID {
 			return true
 		}
 	}
