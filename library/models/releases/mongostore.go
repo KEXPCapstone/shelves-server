@@ -58,3 +58,13 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 	}
 	return releases, nil
 }
+
+// retrieves a list of all distinct artists in the library, sorted alphabetically
+func (ms *MgoStore) GetAllArtists() ([]string, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	artists := []string{}
+	if err := coll.Find(nil).Sort("KEXPReleaseArtistCredit").Distinct("KEXPReleaseArtistCredit", &artists); err != nil {
+		return nil, err
+	}
+	return artists, nil
+}
