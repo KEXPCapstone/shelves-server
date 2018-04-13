@@ -66,5 +66,16 @@ func (ms *MgoStore) GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*
 }
 
 func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
-	return nil, nil
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	iter := coll.Find(nil).Iter()
+	release := Release{}
+	t := indexes.CreateTrieRoot()
+	for iter.Next(&release) {
+		//t.AddToTrie the match criteria struct
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, err
+	}
+	return t, nil
 }

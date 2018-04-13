@@ -10,11 +10,16 @@ import (
 )
 
 type TrieNode struct {
-	Key        rune
-	Children   map[rune]*TrieNode
-	ReleaseIDs []bson.ObjectId
-	Parent     *TrieNode
-	mx         sync.RWMutex
+	Key         rune
+	Children    map[rune]*TrieNode
+	SearchValue SearchValue
+	Parent      *TrieNode
+	mx          sync.RWMutex
+}
+
+type SearchValue struct {
+	ReleaseID      bson.ObjectId `json:"releaseID"`
+	FieldMatchedOn string        `json:"fieldMatchedOn"`
 }
 
 func CreateTrieRoot() *TrieNode {
