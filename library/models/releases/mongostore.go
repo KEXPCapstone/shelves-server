@@ -62,7 +62,7 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 	return releases, nil
 }
 
-func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*Release, error) {
+func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
 	for _, match := range searchResults {
 		release, err := ms.GetReleaseByID(match.ReleaseID)

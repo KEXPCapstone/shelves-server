@@ -68,7 +68,7 @@ type Track struct {
 }
 
 type ReleaseAndMatchCriteria struct {
-	Release   Release              `json:"release"`
+	Release   *Release             `json:"release"`
 	IndexInfo indexes.SearchResult `json:"indexInfo"`
 }
 
