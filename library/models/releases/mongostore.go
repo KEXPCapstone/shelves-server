@@ -63,8 +63,16 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 }
 
 func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*Release, error) {
-	// TODO
-	return nil, nil
+	results := []*ReleaseAndMatchCriteria{}
+	for _, match := range searchResults {
+		release, err := ms.GetReleaseByID(match.ReleaseID)
+		if err != nil {
+			return nil, err // should we return this? this would be returned in the case that the object id is in the trie but not in the db...
+		}
+		results = append(results, &ReleaseAndMatchCriteria{Release: release, IndexInfo: match})
+	}
+
+	return results, nil
 }
 
 func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
