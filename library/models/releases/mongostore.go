@@ -1,6 +1,7 @@
 package releases
 
 import (
+	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -61,5 +62,9 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 
 func (ms *MgoStore) GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*Release, error) {
 	// TODO
+	return nil, nil
+}
+
+func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
 	return nil, nil
 }
