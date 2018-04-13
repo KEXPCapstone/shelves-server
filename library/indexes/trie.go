@@ -103,7 +103,7 @@ func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results
 	return results
 }
 
-func (t *TrieNode) RemoveKeyVal(key string, value bson.ObjectId) error {
+func (t *TrieNode) RemoveKeyAndReleaseID(key string, value bson.ObjectId) error {
 	t.mx.Lock()
 	defer t.mx.Unlock()
 	node, err := t.searchPrefixForNode(key)
@@ -111,9 +111,9 @@ func (t *TrieNode) RemoveKeyVal(key string, value bson.ObjectId) error {
 		return err
 	}
 	found := false
-	for i, id := range node.ReleaseIDs {
-		if id == value {
-			node.ReleaseIDs = append(node.ReleaseIDs[:i], node.ReleaseIDs[i+1:]...)
+	for i, searchResult := range node.SearchResults {
+		if searchResult.ReleaseID == value {
+			node.SearchResults = append(node.SearchResults[:i], node.SearchResults[i+1:]...)
 			found = true
 		}
 	}
@@ -122,7 +122,7 @@ func (t *TrieNode) RemoveKeyVal(key string, value bson.ObjectId) error {
 	}
 
 	curr := node
-	for curr.Key != 0 && len(curr.ReleaseIDs) == 0 && len(curr.Children) == 0 { // check if curr.Key is empty (for the root node)
+	for curr.Key != 0 && len(curr.SearchResults) == 0 && len(curr.Children) == 0 { // check if curr.Key is empty (for the root node)
 		// remove current from the parent's list of children
 		delete(curr.Parent.Children, curr.Key)
 		curr = curr.Parent
