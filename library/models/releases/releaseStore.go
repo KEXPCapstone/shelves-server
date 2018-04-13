@@ -1,6 +1,9 @@
 package releases
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"github.com/KEXPCapstone/shelves-server/library/indexes"
+	"gopkg.in/mgo.v2/bson"
+)
 
 type ReleaseStore interface {
 	Insert(release *Release) error
@@ -23,4 +26,6 @@ type ReleaseStore interface {
 	GetReleasesByField(field string, value string) ([]*Release, error)
 
 	GetReleasesBySliceObjectIDs(releaseIDs []bson.ObjectId) ([]*Release, error)
+
+	IndexReleases() (*indexes.TrieNode, error)
 }
