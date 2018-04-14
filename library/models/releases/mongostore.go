@@ -60,11 +60,28 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 }
 
 // retrieves a list of all distinct artists in the library, sorted alphabetically
+// TODO: implement this query:
+// db.releases.aggregate([{$group: {_id: "$KEXPReleaseArtistCredit", totalReleases: {$sum:1}}},{$sort:{_id: 1}}], {collation:{locale: "en", strength: 1}})
 func (ms *MgoStore) GetAllArtists() ([]string, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
-	artists := []string{}
-	if err := coll.Find(nil).Sort("KEXPReleaseArtistCredit").Distinct("KEXPReleaseArtistCredit", &artists); err != nil {
+	db := ms.session.DB(ms.dbname)
+	result := []string{}
+	// bson.M for nested fields to be handled gracefully
+	pipeline := []bson.M{
+		bson.M{
+			"$group": bson.M{
+				"_id":           "$KEXPReleaseArtistCredit",
+				"totalReleases": bson.M{"$sum": 1},
+			},
+		},
+		bson.M{
+			"$sort": bson.M{"_id": 1},
+		},
+	}
+	collation := bson.M{"locale": "en", "strength": 1}
+	// using bson.D here to maintain ordering, since mongo will interpret first key as the command name
+	db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result)
+	if err := db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result); err != nil {
 		return nil, err
 	}
-	return artists, nil
+	return result, nil
 }
