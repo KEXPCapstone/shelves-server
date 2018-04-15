@@ -11,6 +11,29 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// TODO: Will probably remove
+func (hCtx *HandlerCtx) InsertRelease(w http.ResponseWriter, r *http.Request) {
+	release := &releases.Release{}
+	if err := json.NewDecoder(r.Body).Decode(release); err != nil {
+		http.Error(w, fmt.Sprintf(ErrDecodingJSON+"%v", err), http.StatusBadRequest)
+		return
+	}
+	if err := hCtx.releaseStore.Insert(release); err != nil {
+		http.Error(w, fmt.Sprintf(ErrInsertRelease+"%v", err), http.StatusInternalServerError)
+		return
+	}
+	respond(w, http.StatusCreated, release)
+}
+
+func (hCtx *HandlerCtx) FindReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
+	releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
+	if err != nil {
+		http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
+		return
+	}
+	respond(w, http.StatusOK, releases)
+}
+
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	field := r.URL.Query().Get("field")
 	value := r.URL.Query().Get("value")
@@ -18,24 +41,10 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 
 	switch r.Method {
 	case http.MethodPost:
-		release := &releases.Release{}
-		if err := json.NewDecoder(r.Body).Decode(release); err != nil {
-			http.Error(w, fmt.Sprintf(ErrDecodingJSON+"%v", err), http.StatusBadRequest)
-			return
-		}
-		if err := hCtx.releaseStore.Insert(release); err != nil {
-			http.Error(w, fmt.Sprintf(ErrInsertRelease+"%v", err), http.StatusInternalServerError)
-			return
-		}
-		respond(w, http.StatusCreated, release)
+		hCtx.InsertRelease(w, r)
 	case http.MethodGet:
 		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
-			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
-			if err != nil {
-				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
-				return
-			}
-			respond(w, http.StatusOK, releases)
+			hCtx.FindReleasesByField(w, r, field, value)
 		} else if len(searchTerm) != 0 {
 			searchTerm = strings.ToLower(searchTerm)
 			searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
