@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -31,8 +30,6 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
 		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
-			log.Println(field)
-			log.Println(value)
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
