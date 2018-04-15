@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"gopkg.in/mgo.v2/bson"
@@ -14,6 +14,7 @@ import (
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	field := r.URL.Query().Get("field")
 	value := r.URL.Query().Get("value")
+	searchTerm := r.URL.Query().Get("q")
 
 	switch r.Method {
 	case http.MethodPost:
@@ -28,16 +29,24 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		respond(w, http.StatusCreated, release)
 	case http.MethodGet:
-		if len(field) != 0 && len(value) != 0 {
-			log.Println(field)
-			log.Println(value)
+		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
 			releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 				return
 			}
 			respond(w, http.StatusOK, releases)
-		} else {
+		} else if len(searchTerm) != 0 {
+			searchTerm = strings.ToLower(searchTerm)
+			searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
+			foundReleases, err := hCtx.releaseStore.GetReleasesBySliceSearchResults(searchResults)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
+				return
+			}
+			respond(w, http.StatusOK, foundReleases)
+
+		} else { // What if we want to show results as user types? If searchTerm == 0, then all results are returned
 			releases, err := hCtx.releaseStore.GetAllReleases()
 			if err != nil {
 				http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)

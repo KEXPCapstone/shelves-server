@@ -39,7 +39,12 @@ func main() {
 
 	mongoStore := releases.NewMgoStore(mongoSess, releaseDb, releaseColl)
 
-	hCtx := handlers.NewHandlerContext(mongoStore)
+	releaseTrie, err := mongoStore.IndexReleases()
+	if err != nil {
+		// TODO
+	}
+
+	hCtx := handlers.NewHandlerContext(mongoStore, releaseTrie)
 
 	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)

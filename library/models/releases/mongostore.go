@@ -1,6 +1,9 @@
 package releases
 
 import (
+	"strings"
+
+	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -57,4 +60,32 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 		return nil, err
 	}
 	return releases, nil
+}
+
+func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
+	results := []*ReleaseAndMatchCriteria{}
+	for _, match := range searchResults {
+		release, err := ms.GetReleaseByID(match.ReleaseID)
+		if err != nil {
+			return nil, err // should we return this? this would be returned in the case that the object id is in the trie but not in the db...
+		}
+		results = append(results, &ReleaseAndMatchCriteria{Release: release, IndexInfo: match})
+	}
+
+	return results, nil
+}
+
+func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	iter := coll.Find(nil).Iter()
+	release := Release{}
+	t := indexes.CreateTrieRoot()
+	for iter.Next(&release) {
+		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
+	}
+
+	if err := iter.Close(); err != nil {
+		return nil, err
+	}
+	return t, nil
 }

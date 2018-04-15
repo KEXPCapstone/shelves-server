@@ -3,6 +3,7 @@ package releases
 import (
 	"time"
 
+	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -64,6 +65,11 @@ type Track struct {
 	Name      string `json:"name"`
 	Length    string `json:"length"`
 	FCCRating string `json:"FCCRating"`
+}
+
+type ReleaseAndMatchCriteria struct {
+	Release   *Release             `json:"release"`
+	IndexInfo indexes.SearchResult `json:"indexInfo"`
 }
 
 type Note struct {
