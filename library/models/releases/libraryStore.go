@@ -26,7 +26,7 @@ type LibraryStore interface {
 	GetArtists() ([]*Artist, error)
 
 	// return a specific artist with the supplied musicbrainz artist MBID
-	GetArtistByMBID(id string) ([]*Artist, error)
+	GetArtistByMBID(id string) (*Artist, error)
 
 	// return all genres in the library
 	GetGenres() ([]*Genre, error)
