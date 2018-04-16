@@ -56,6 +56,16 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// ArtistsHandler path: /v1/library/artists
+func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+// GenresHandler path: /v1/library/genres
+func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
 // TODO: Will probably remove
 func (hCtx *HandlerCtx) insertRelease(w http.ResponseWriter, r *http.Request) {
 	release := &releases.Release{}
