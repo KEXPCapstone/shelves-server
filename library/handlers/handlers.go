@@ -23,13 +23,24 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 	case http.MethodGet:
 		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
 			hCtx.findReleasesByField(w, r, field, value)
-		} else if len(searchTerm) != 0 {
-			hCtx.prefixSearch(w, r, searchTerm)
-		} else { // What if we want to show results as user types? If searchTerm == 0, then all results are returned
-			hCtx.getAllReleases(w, r)
 		}
 	default:
-		http.Error(w, ReleasesHandlerInvalidMethod, http.StatusMethodNotAllowed)
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+// SearchHandler path: /v1/library/search
+func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
+	searchTerm := r.URL.Query().Get("q")
+
+	switch r.Method {
+	case http.MethodGet:
+		if len(searchTerm) != 0 {
+			hCtx.prefixSearch(w, r, searchTerm)
+		}
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -51,7 +62,7 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 		}
 		respond(w, http.StatusOK, release)
 	default:
-		http.Error(w, SingleReleaseHandlerInvalidMethod, http.StatusMethodNotAllowed)
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	}
 }
