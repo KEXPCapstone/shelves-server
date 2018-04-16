@@ -11,6 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// ReleasesHandler path: /v1/library/releases
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	field := r.URL.Query().Get("field")
 	value := r.URL.Query().Get("value")
@@ -33,6 +34,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// SingleReleaseHandler path: /v1/library/releases/
 func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if !bson.IsObjectIdHex(releaseID) {
@@ -42,7 +44,7 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 	releaseIDBson := bson.ObjectIdHex(releaseID)
 	switch r.Method {
 	case http.MethodGet:
-		release, err := hCtx.releaseStore.GetReleaseByID(releaseIDBson)
+		release, err := hCtx.libraryStore.GetReleaseByID(releaseIDBson)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 			return
@@ -54,6 +56,16 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// ArtistsHandler path: /v1/library/artists
+func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+// GenresHandler path: /v1/library/genres
+func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
 // TODO: Will probably remove
 func (hCtx *HandlerCtx) insertRelease(w http.ResponseWriter, r *http.Request) {
 	release := &releases.Release{}
@@ -61,7 +73,7 @@ func (hCtx *HandlerCtx) insertRelease(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf(ErrDecodingJSON+"%v", err), http.StatusBadRequest)
 		return
 	}
-	if err := hCtx.releaseStore.Insert(release); err != nil {
+	if err := hCtx.libraryStore.AddRelease(release); err != nil {
 		http.Error(w, fmt.Sprintf(ErrInsertRelease+"%v", err), http.StatusInternalServerError)
 		return
 	}
@@ -69,7 +81,7 @@ func (hCtx *HandlerCtx) insertRelease(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
-	releases, err := hCtx.releaseStore.GetReleasesByField(field, value)
+	releases, err := hCtx.libraryStore.GetReleasesByField(field, value)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 		return
@@ -80,7 +92,7 @@ func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Reque
 func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string) {
 	searchTerm = strings.ToLower(searchTerm)
 	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
-	foundReleases, err := hCtx.releaseStore.GetReleasesBySliceSearchResults(searchResults)
+	foundReleases, err := hCtx.libraryStore.GetReleasesBySliceSearchResults(searchResults)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
 		return
@@ -90,7 +102,7 @@ func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, sea
 
 // Probably won't use this--if used should be paginated
 func (hCtx *HandlerCtx) getAllReleases(w http.ResponseWriter, r *http.Request) {
-	releases, err := hCtx.releaseStore.GetAllReleases()
+	releases, err := hCtx.libraryStore.GetReleases()
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 		return

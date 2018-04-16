@@ -8,35 +8,44 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// implements LibraryStore interface
-type MgoStore struct {
-	session *mgo.Session
-	dbname  string
-	colname string
+// MongoStore implements LibraryStore interface
+type MongoStore struct {
+	session           *mgo.Session
+	dbname            string
+	releaseCollection string
+	artistCollection  string
+	genreCollection   string
 }
 
-func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
+// NewMongoStore returns a new MongoStore struct with fields initialized to the passed parameters
+func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, artistCollection string, genreCollection string) *MongoStore {
 	if sess == nil {
 		panic(NoMgoSess)
 	}
-	return &MgoStore{
-		session: sess,
-		dbname:  dbName,
-		colname: collectionName,
+	return &MongoStore{
+		session:           sess,
+		dbname:            dbName,
+		releaseCollection: releaseCollection,
+		artistCollection:  artistCollection,
+		genreCollection:   genreCollection,
 	}
 }
 
-func (ms *MgoStore) Insert(release *Release) error {
+// AddRelease inserts a single release into the library
+func (ms *MongoStore) AddRelease(release *Release) error {
 	// TODO: Change parameter to something like "New Release", and then call validation methods
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	if err := coll.Insert(release); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ms *MgoStore) GetAllReleases() ([]*Release, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
+// GetReleases returns all releases in the library
+// TODO: fetching every release doc will be too large to handle on the frontend
+// we will want to implement pagination instead
+func (ms *MongoStore) GetReleases() ([]*Release, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
 	if err := coll.Find(nil).All(&releases); err != nil {
 		return nil, err
@@ -44,8 +53,9 @@ func (ms *MgoStore) GetAllReleases() ([]*Release, error) {
 	return releases, nil
 }
 
-func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
+// GetReleaseByID returns a single release in the library
+func (ms *MongoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
 		return nil, err
@@ -53,8 +63,10 @@ func (ms *MgoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
 	return release, nil
 }
 
-func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
+// GetReleasesByField accepts a pairing of a field key and value
+// returning a slice of releases where release.field['value'] matches the passed params
+func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
 	if err := coll.Find(bson.M{field: value}).All(&releases); err != nil {
 		return nil, err
@@ -62,7 +74,7 @@ func (ms *MgoStore) GetReleasesByField(field string, value string) ([]*Release, 
 	return releases, nil
 }
 
-func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
+func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
 	for _, match := range searchResults {
 		release, err := ms.GetReleaseByID(match.ReleaseID)
@@ -75,8 +87,8 @@ func (ms *MgoStore) GetReleasesBySliceSearchResults(searchResults []indexes.Sear
 	return results, nil
 }
 
-func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
+func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	iter := coll.Find(nil).Iter()
 	release := Release{}
 	t := indexes.CreateTrieRoot()
@@ -89,3 +101,72 @@ func (ms *MgoStore) IndexReleases() (*indexes.TrieNode, error) {
 	}
 	return t, nil
 }
+
+// GetArtists returns all artists in the library
+// TODO: pagination (as in GetReleases)
+func (ms *MongoStore) GetArtists() ([]*Artist, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
+	artists := []*Artist{}
+	if err := coll.Find(nil).All(&artists); err != nil {
+		return nil, err
+	}
+	return artists, nil
+}
+
+// GetArtistByMBID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
+func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
+	artist := &Artist{}
+	if err := coll.FindId(id).One(artist); err != nil {
+		return nil, err
+	}
+	return artist, nil
+}
+
+// GetGenres returns all genres in the library
+// TODO: pagination (again)
+func (ms *MongoStore) GetGenres() ([]*Genre, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.genreCollection)
+	genres := []*Genre{}
+	if err := coll.Find(nil).All(&genres); err != nil {
+		return nil, err
+	}
+	return genres, nil
+}
+
+// GetGenreByID returns a specific genre with the supplied id
+func (ms *MongoStore) GetGenreByID(id bson.ObjectId) (*Genre, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.genreCollection)
+	genre := &Genre{}
+	if err := coll.FindId(id).One(genre); err != nil {
+		return nil, err
+	}
+	return genre, nil
+}
+
+// retrieves a list of all distinct artists in the library, sorted alphabetically
+// // TODO: refine this query
+// // > db.releases.aggregate([{$group: {_id: "$KEXPReleaseArtistCredit", releases: {$push: {id: "$_id", KEXPTitle: "$KEXPTitle", KEXPMBID: "$KEXPMBID"}}}},{$sort:{_id:1}},{$out: "artists"}],{collation:{locale: "en", strength: 1}})
+// func (ms *MongoStore) GetAllArtists() ([]string, error) {
+// 	db := ms.session.DB(ms.dbname)
+// 	result := []string{}
+// 	// bson.M for nested fields to be handled gracefully
+// 	pipeline := []bson.M{
+// 		bson.M{
+// 			"$group": bson.M{
+// 				"_id":           "$KEXPReleaseArtistCredit",
+// 				"totalReleases": bson.M{"$sum": 1},
+// 			},
+// 		},
+// 		bson.M{
+// 			"$sort": bson.M{"_id": 1},
+// 		},
+// 	}
+// 	collation := bson.M{"locale": "en", "strength": 1}
+// 	// using bson.D here to maintain ordering, since mongo will interpret first key as the command name
+// 	db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result)
+// 	if err := db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result); err != nil {
+// 		return nil, err
+// 	}
+// 	return result, nil
+// }
