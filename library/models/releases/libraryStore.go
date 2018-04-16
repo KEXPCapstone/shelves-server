@@ -11,7 +11,7 @@ import (
 type LibraryStore interface {
 
 	// add a single release into the library
-	AddRelease(release *Release) error
+	AddRelease(release *Release) (*Release, error)
 
 	// return all releases in the library
 	GetReleases() ([]*Release, error)

@@ -32,13 +32,13 @@ func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, a
 }
 
 // AddRelease inserts a single release into the library
-func (ms *MongoStore) AddRelease(release *Release) error {
+func (ms *MongoStore) AddRelease(release *Release) (*Release, error) {
 	// TODO: Change parameter to something like "New Release", and then call validation methods
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	if err := coll.Insert(release); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return release, nil
 }
 
 // GetReleases returns all releases in the library

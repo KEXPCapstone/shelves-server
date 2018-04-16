@@ -73,11 +73,12 @@ func (hCtx *HandlerCtx) insertRelease(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf(ErrDecodingJSON+"%v", err), http.StatusBadRequest)
 		return
 	}
-	if err := hCtx.libraryStore.AddRelease(release); err != nil {
+	result, err := hCtx.libraryStore.AddRelease(release)
+	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrInsertRelease+"%v", err), http.StatusInternalServerError)
 		return
 	}
-	respond(w, http.StatusCreated, release)
+	respond(w, http.StatusCreated, result)
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
