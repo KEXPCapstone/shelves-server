@@ -41,13 +41,12 @@ func (ms *MongoStore) AddRelease(release *Release) (*Release, error) {
 	return release, nil
 }
 
-// GetReleases returns all releases in the library
-// TODO: fetching every release doc will be too large to handle on the frontend
-// we will want to implement pagination instead
-func (ms *MongoStore) GetReleases() ([]*Release, error) {
+// GetReleases returns releases in the library greater than 'lastID'
+// 'limit' specifies the max # of releases to return
+func (ms *MongoStore) GetReleases(lastID bson.ObjectId, limit int) ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
-	if err := coll.Find(nil).All(&releases); err != nil {
+	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&releases); err != nil {
 		return nil, err
 	}
 	return releases, nil
@@ -102,12 +101,12 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	return t, nil
 }
 
-// GetArtists returns all artists in the library
-// TODO: pagination (as in GetReleases)
-func (ms *MongoStore) GetArtists() ([]*Artist, error) {
+// GetArtists returns artists in the library greater than 'lastID'
+// 'limit' specifies the max # of docs to return
+func (ms *MongoStore) GetArtists(lastID bson.ObjectId, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
-	if err := coll.Find(nil).All(&artists); err != nil {
+	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&artists); err != nil {
 		return nil, err
 	}
 	return artists, nil
@@ -123,12 +122,12 @@ func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
 	return artist, nil
 }
 
-// GetGenres returns all genres in the library
-// TODO: pagination (again)
-func (ms *MongoStore) GetGenres() ([]*Genre, error) {
+// GetGenres returns genres in the library greater than 'lastID'
+// 'limit' specifies the max # of docs to return
+func (ms *MongoStore) GetGenres(lastID bson.ObjectId, limit int) ([]*Genre, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.genreCollection)
 	genres := []*Genre{}
-	if err := coll.Find(nil).All(&genres); err != nil {
+	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&genres); err != nil {
 		return nil, err
 	}
 	return genres, nil
