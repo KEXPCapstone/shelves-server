@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // a helper function which will create a new MongoDB database
@@ -85,7 +86,9 @@ func TestAddRelease(t *testing.T) {
 		t.Errorf("[MetaTest] Error creating test MongoStore: '%v", err)
 	}
 	// unmarshal an example doc into release struct
-	newRelease := &Release{}
+	newRelease := &Release{
+		ID: bson.NewObjectId(),
+	}
 	// this example doc could be re-used, made a constant for other testing
 	rawJSON := `{"KEXPReleaseGroupMBID" : "62917949-8997-409b-94fb-af8a41ff3c52", "KEXPPrimaryGenre" : "Rock/Pop", "KEXPCountryCode" : "US", "KEXPDateReleased" : "2015-09-25", "KEXPMBID" : "cd7d006c-a9fa-4094-a733-6d001dcfa4b4", "KEXPReleaseArtistCredit" : "Kurt Vile", "KEXPArtist_KEXPSortName" : "Vile, Kurt", "KEXPFirstReleaseDate" : "2015-09-25", "KEXPTitle" : "b'lieve i'm goin down..."}`
 	buffer := []byte(rawJSON)
