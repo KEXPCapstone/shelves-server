@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
@@ -21,26 +22,40 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 	case http.MethodPost:
 		hCtx.insertRelease(w, r)
 	case http.MethodGet:
-		if len(field) != 0 && len(value) != 0 && len(searchTerm) == 0 {
-			hCtx.findReleasesByField(w, r, field, value)
+		lastID := r.URL.Query().Get("last_id")
+		limit := r.URL.Query().Get("limit")
+
+		intLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			// for now this is a 500
+			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
 		}
+		hCtx.libraryStore.GetReleases(bson.ObjectIdHex(lastID), intLimit)
+
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	}
 }
 
-// SearchHandler path: /v1/library/search
-func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
-	searchTerm := r.URL.Query().Get("q")
+// RelatedReleasesHandler path: /v1/library/releases/related
+// :param: field, the field key to match on
+// :param: value, the target value of the match field
+func (hCtx *HandlerCtx) RelatedReleasesHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		if len(searchTerm) != 0 {
+		field := r.URL.Query().Get("field")
+		value := r.URL.Query().Get("value")
+		if len(field) != 0 && len(value) != 0 {
+			hCtx.findReleasesByField(w, r, field, value)
+		} else if len(searchTerm) != 0 {
 			hCtx.prefixSearch(w, r, searchTerm)
+		} else { // What if we want to show results as user types? If searchTerm == 0, then all results are returned
+			hCtx.getAllReleases(w, r)
 		}
 	default:
-		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		http.Error(w, ReleasesHandlerInvalidMethod, http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -62,7 +77,7 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 		}
 		respond(w, http.StatusOK, release)
 	default:
-		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		http.Error(w, SingleReleaseHandlerInvalidMethod, http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -110,14 +125,4 @@ func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, sea
 		return
 	}
 	respond(w, http.StatusOK, foundReleases)
-}
-
-// Probably won't use this--if used should be paginated
-func (hCtx *HandlerCtx) getAllReleases(w http.ResponseWriter, r *http.Request) {
-	releases, err := hCtx.libraryStore.GetReleases()
-	if err != nil {
-		http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
-		return
-	}
-	respond(w, http.StatusOK, releases)
 }
