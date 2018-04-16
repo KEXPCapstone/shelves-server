@@ -6,13 +6,13 @@ import (
 )
 
 type HandlerCtx struct {
-	releaseStore releases.ReleaseStore
+	libraryStore releases.LibraryStore
 	releaseTrie  *indexes.TrieNode
 }
 
-func NewHandlerContext(rs releases.ReleaseStore, rt *indexes.TrieNode) *HandlerCtx {
+func NewHandlerContext(ls releases.LibraryStore, rt *indexes.TrieNode) *HandlerCtx {
 	return &HandlerCtx{
-		releaseStore: rs,
+		libraryStore: ls,
 		releaseTrie:  rt,
 	}
 }

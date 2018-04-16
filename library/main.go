@@ -32,12 +32,20 @@ func main() {
 	if len(releaseColl) == 0 {
 		log.Fatal("Please provide RELEASECOLL")
 	}
+	artistColl := os.Getenv("ARTISTCOLL")
+	if len(artistColl) == 0 {
+		log.Fatal("Please provide ARTISTCOLL")
+	}
+	genreColl := os.Getenv("GENRECOLL")
+	if len(genreColl) == 0 {
+		log.Fatal("Please provide GENRECOLL")
+	}
 	mongoSess, err := mgo.Dial(dbAddr)
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := releases.NewMgoStore(mongoSess, releaseDb, releaseColl)
+	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl)
 
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
@@ -48,6 +56,8 @@ func main() {
 
 	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
+	mux.HandleFunc("/v1/library/artists", hCtx.ArtistsHandler)
+	mux.HandleFunc("/v1/library/artists", hCtx.GenresHandler)
 
 	log.Printf("Library microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))

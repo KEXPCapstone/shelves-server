@@ -22,7 +22,7 @@ import (
 // 	// Add image URL?
 // }
 
-// Changed name from DaletRelease for testing
+// Release represents a single release for an album in the KEXP library
 type Release struct {
 	ID                            bson.ObjectId `json:"id" bson:"_id"`
 	KEXPPrimaryGenre              string        `json:"KEXPPrimaryGenre" bson:"KEXPPrimaryGenre"`
