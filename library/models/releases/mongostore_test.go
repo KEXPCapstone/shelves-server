@@ -24,24 +24,6 @@ func createTestingMgoStore() (*MongoStore, error) {
 	return ms, nil
 }
 
-// // a helper function for testing which inserts a valid user object
-// // into the provided MongoDB database
-// func insertTestingData(ms *MongoStore) (*, error) {
-// 	nu := NewUser{
-// 		Email:        "test@example.com",
-// 		Password:     "password",
-// 		PasswordConf: "password",
-// 		UserName:     "uname",
-// 		FirstName:    "fname",
-// 		LastName:     "lname",
-// 	}
-// 	usr, err := ms.Insert(&nu)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("Error inserting user into DB: %v", err)
-// 	}
-// 	return usr, nil
-// }
-
 func TestNewMongoStore(t *testing.T) {
 	dbname := "library"
 	releaseCol := "releases"
@@ -100,5 +82,20 @@ func TestAddRelease(t *testing.T) {
 	}
 	if _, err = libraryStore.AddRelease(nil); err == nil {
 		t.Errorf("Expected error inserting `nil` release doc")
+	}
+}
+
+func TestGetReleases(t *testing.T) {
+
+}
+
+func TestGetReleaseByID(t *testing.T) {
+	libraryStore, err := createTestingMgoStore()
+	if err != nil {
+		t.Errorf("[MetaTest] Error creating test MongoStore: '%v", err)
+	}
+	// non-existent doc, valid bson ID
+	if release, err := libraryStore.GetReleaseByID(bson.NewObjectId()); err == nil {
+		t.Errorf("Expected error, did not receive one: '%v'", release)
 	}
 }
