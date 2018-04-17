@@ -70,8 +70,10 @@ func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 	curr := t
 	for _, char := range prefix {
 		child, ok := curr.Children[char]
+
 		if ok {
 			curr = child
+
 		} else {
 			return nil, errors.New("Prefix doesn't exist in trie")
 		}
@@ -81,6 +83,7 @@ func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 
 func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []SearchResult, idsInResults map[bson.ObjectId]bool) []SearchResult {
 	for _, searchResult := range node.SearchResults {
+
 		_, ok := idsInResults[searchResult.ReleaseID]
 		if len(results) < maxResults && !ok {
 			idsInResults[searchResult.ReleaseID] = true

@@ -26,8 +26,14 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 		if err != nil {
 			// for now this is a 500
 			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
+			return
 		}
-		hCtx.libraryStore.GetReleases(bson.ObjectIdHex(lastID), intLimit)
+		releases, err := hCtx.libraryStore.GetReleases(bson.ObjectIdHex(lastID), intLimit)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Could not get releases: %v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, releases)
 
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
