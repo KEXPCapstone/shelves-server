@@ -2,7 +2,6 @@ package indexes
 
 import (
 	"errors"
-	"log"
 	"sort"
 	"sync"
 	"unicode/utf8"
@@ -62,7 +61,6 @@ func (t *TrieNode) SearchReleases(prefix string, maxResults int) []SearchResult 
 	defer t.mx.RUnlock()
 	startNode, err := t.searchPrefixForNode(prefix)
 	if err != nil {
-		log.Println("Error returned from SearchReleases in trie.go")
 		return []SearchResult{}
 	}
 	return t.findResultsFromPrefix(startNode, maxResults, []SearchResult{}, make(map[bson.ObjectId]bool))
@@ -70,13 +68,12 @@ func (t *TrieNode) SearchReleases(prefix string, maxResults int) []SearchResult 
 
 func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 	curr := t
-	log.Println("Beginning to search for end of prefix node...")
 	for _, char := range prefix {
 		child, ok := curr.Children[char]
 
 		if ok {
 			curr = child
-			log.Println(curr.Key)
+
 		} else {
 			return nil, errors.New("Prefix doesn't exist in trie")
 		}
@@ -85,9 +82,7 @@ func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 }
 
 func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []SearchResult, idsInResults map[bson.ObjectId]bool) []SearchResult {
-	log.Println("Printing search results to log from findResultsFromPrefix: ")
 	for _, searchResult := range node.SearchResults {
-		log.Println(searchResult.FieldMatchedOn)
 
 		_, ok := idsInResults[searchResult.ReleaseID]
 		if len(results) < maxResults && !ok {

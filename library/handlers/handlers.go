@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -111,11 +110,8 @@ func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Reque
 
 func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string) {
 	searchTerm = strings.ToLower(searchTerm)
-	log.Println("Going to search for: " + searchTerm)
 	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
-	log.Println("Retrieved searchResults from trie, going to fetch docs from mongo...")
 	foundReleases, err := hCtx.libraryStore.GetReleasesBySliceSearchResults(searchResults)
-	log.Println("Fetched release documents from mongo")
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
 		return
