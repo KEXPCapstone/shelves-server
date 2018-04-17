@@ -50,6 +50,8 @@ func main() {
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
 		// TODO
+		log.Println("ERROR RETURNED INDEXING USERS:")
+		log.Println(err)
 	}
 
 	hCtx := handlers.NewHandlerContext(mongoStore, releaseTrie)

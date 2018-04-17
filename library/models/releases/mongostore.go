@@ -1,6 +1,7 @@
 package releases
 
 import (
+	"log"
 	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
@@ -77,7 +78,9 @@ func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release
 func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
 	for _, match := range searchResults {
+		log.Println("Cycling through match in GetReleasesBySliceSearchResults; field matched on: " + match.FieldMatchedOn)
 		release, err := ms.GetReleaseByID(match.ReleaseID)
+		log.Println("Got a release for the id from mongo! ")
 		if err != nil {
 			return nil, err // should we return this? this would be returned in the case that the object id is in the trie but not in the db...
 		}
