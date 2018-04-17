@@ -49,7 +49,7 @@ func main() {
 
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
-		log.Fatalf("Could not index releases: " + err)
+		log.Fatalf("Could not index releases")
 	}
 
 	hCtx := handlers.NewHandlerContext(mongoStore, releaseTrie)
