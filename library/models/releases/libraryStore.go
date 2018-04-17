@@ -11,10 +11,10 @@ import (
 type LibraryStore interface {
 
 	// add a single release into the library
-	AddRelease(release *Release) error
+	AddRelease(release *Release) (*Release, error)
 
 	// return all releases in the library
-	GetReleases() ([]*Release, error)
+	GetReleases(lastID bson.ObjectId, limit int) ([]*Release, error)
 
 	// return a single release with the supplied id
 	GetReleaseByID(id bson.ObjectId) (*Release, error)
@@ -23,13 +23,13 @@ type LibraryStore interface {
 	GetReleasesByField(field string, value string) ([]*Release, error)
 
 	// return all artists in the library
-	GetArtists() ([]*Artist, error)
+	GetArtists(lastID bson.ObjectId, limit int) ([]*Artist, error)
 
 	// return a specific artist with the supplied musicbrainz artist MBID
 	GetArtistByMBID(id string) (*Artist, error)
 
 	// return all genres in the library
-	GetGenres() ([]*Genre, error)
+	GetGenres(lastID bson.ObjectId, limit int) ([]*Genre, error)
 
 	// return a specific genre with the supplied id
 	GetGenreByID(id bson.ObjectId) (*Genre, error)

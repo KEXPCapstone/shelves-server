@@ -58,6 +58,7 @@ func main() {
 
 	mux.HandleFunc("/v1/library/releases", hCtx.ReleasesHandler)
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
+	mux.HandleFunc("/v1/library/releases/search", hCtx.SearchHandler)
 	mux.HandleFunc("/v1/library/artists", hCtx.ArtistsHandler)
 	mux.HandleFunc("/v1/library/genres", hCtx.GenresHandler)
 
