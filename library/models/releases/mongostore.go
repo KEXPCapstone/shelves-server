@@ -93,6 +93,9 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
+		t.AddToTrie(strings.ToLower(release.KEXPDateReleased), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPDateReleased"})
+		t.AddToTrie(strings.ToLower(release.KEXPTitle), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPTitle"})
+
 	}
 
 	if err := iter.Close(); err != nil {
