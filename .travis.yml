@@ -14,7 +14,7 @@ git:
 deploy:
   provider: script
   skip_cleanup: true
-  script: chmod 600 deploy_key && scp -o StrictHostKeyChecking=no -i deploy_key docker-compose.prod.yml root@104.131.43.177:/root/docker-compose.yml && ssh -o StrictHostKeyChecking=no -i deploy_key root@api.kexpshelves.com ./deploy.sh
+  script: chmod 600 deploy_key && ssh -o StrictHostKeyChecking=no -i deploy_key root@104.131.43.177 ./deploy.sh
   on:
     branch: master
 env:
