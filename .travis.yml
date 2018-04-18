@@ -16,7 +16,7 @@ deploy:
   skip_cleanup: true
   script: chmod 600 deploy_key && scp -o StrictHostKeyChecking=no -i deploy_key docker-compose.prod.yml root@104.131.43.177:/root/docker-compose.yml && ssh -o StrictHostKeyChecking=no -i deploy_key root@api.kexpshelves.com ./deploy.sh
   on:
-    branch: master
+    branch: continuous-deployment
 env:
   global:
   - secure: dgM97FViCmdCjC1xivDdCzTER8Nj2PW/y1c6QsEFYX8mW61jVkPLKgPAe/LgxpOaAxMRqoVZcj2cnITXIl2unav5aiM128nhP/OlCaHKVzkvvqVsebhC2j0g89mxlVNQCh5ISIAKx9/0OPsraxiDAEv1CqUaPhD+l3fY0lQgKVecuT+NURJuUPcW0/gTDyGgvo7cfKjWYtOa0loGmA+6B4pnTGtBhJkzoCmq1ck+51/enQZGVPeZbEuwDzsyylGyW+AE0Gm8PX0sBIjnTjbDVxK7nZyr612U0I8yb//Hz0t183UFVVvJ+oQBq08hcubSxPJmD/hMlhK5IrABDVbXxPsqepIHo+aI4vdkuedMefp4dTYzGJggP2x00F6lVTabLCaii1upWiQGnvVKVyKwAHeygaEYa/VrPg7UOXZ+l8kgXTjCKf9WeWXZKbBi+VRPrcE6cRluyRtB8B8Emw8ajedPJi57Y7lLQy//j/Hhx8TIBE4S4snhEkUCrAh06QRQuz1DjQUlkR0sIQoamaQmBTlXCpJ3jEWHz+FY+LfzUNgqzxlI44+UDabr2hNYDhMZK3ntIJ+6Z9+YxFEI1oqQ9aPULTHhHz7gSSaIFhu57d09IoFiSGsp31z7axWscSRMtzuDI9hcpFC427TAcxMyjZjClVnx+KkTiYcSNfkx0PQ=
