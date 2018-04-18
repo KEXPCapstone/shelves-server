@@ -3,7 +3,8 @@
 version: '3'
 services:
   gateway:
-    build: gateway/ # builds image from ./gateway/Dockerfile, this can be replaced with kexpcapstone/gateway if we want
+    build: gateway/
+    image: kexpcapstone/gatewaysvc
     environment:
       - SHELVESSVCADDR=shelves:80
       - LIBRARYSVCADDR=library:80
@@ -21,18 +22,19 @@ services:
       - dylan
   mongodb:
     image: "mongo"
-    container_name: mongodb
+    container_name: mongo # to be changed if needed
     volumes:
       - ./data:/data/seeds
     networks:
       - dylan
   redissvr:
     image: "redis"
-    container_name: redissvr
+    container_name: redis
     networks:
       - dylan
   library:
     build: library/
+    image: kexpcapstone/librarysvc
     container_name: library
     environment:
       - DBADDR=mongodb:27017
@@ -44,6 +46,7 @@ services:
       - dylan
   shelves:
     build: shelves/
+    image: kexpcapstone/shelvessvc
     container_name: shelves
     environment:
       - DBADDR=mongodb:27017

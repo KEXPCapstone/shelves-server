@@ -3,7 +3,7 @@
 version: '3'
 services:
   gateway:
-    build: gateway/
+    image: kexpcapstone/gatewaysvc:prod
     environment:
       - SHELVESSVCADDR=shelves:80
       - LIBRARYSVCADDR=library:80
@@ -17,22 +17,19 @@ services:
     volumes:
       - /etc/letsencrypt:/tls:ro
     container_name: gateway
-    networks:
-      - dylan
-  mongodb:
-    image: "mongo"
-    container_name: mongodb
-    volumes:
-      - /srv/data:/data/seeds # data for populating release library
-    networks:
-      - dylan
-  redissvr:
-    image: "redis"
-    container_name: redissvr
-    networks:
-      - dylan
+  # disabled for now since this would remove the existing container (with all data)
+  # mongodb:
+  #   image: "mongo"
+  #   container_name: mongo
+  #   volumes:
+  #     - /srv/data:/data/seeds # data for populating release library
+  #   networks:
+  #     - dylan
+  # redissvr:
+  #   image: "redis"
+  #   container_name: redis
   library:
-    build: library/
+    image: kexpcapstone/librarysvc:prod
     container_name: library
     environment:
       - DBADDR=mongodb:27017
@@ -40,14 +37,12 @@ services:
       - RELEASECOLL=releases
       - ARTISTCOLL=artists
       - GENRECOLL=genres
-    networks:
-      - dylan
   shelves:
-    build: shelves/
+    image: kexpcapstone/shelvessvc:prod
     container_name: shelves
     environment:
       - DBADDR=mongodb:27017
-    networks:
-      - dylan
 networks:
-  dylan:
+  default:
+    external:
+      name: dylan
