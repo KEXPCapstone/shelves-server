@@ -27,24 +27,26 @@ func CreateTrieRoot() *TrieNode {
 }
 
 func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
-	t.mx.Lock()
-	curr := t
-	for _, char := range prefix {
-		if curr.Children == nil {
-			curr.Children = make(map[rune]*TrieNode)
-		}
+	if len(prefix) > 0 {
+		t.mx.Lock()
+		curr := t
+		for _, char := range prefix {
+			if curr.Children == nil {
+				curr.Children = make(map[rune]*TrieNode)
+			}
 
-		child, ok := curr.Children[char]
-		if !ok {
-			child = &TrieNode{Key: char, Parent: curr}
-			curr.Children[char] = child // add new node to trie if this part of prefix not in trie
+			child, ok := curr.Children[char]
+			if !ok {
+				child = &TrieNode{Key: char, Parent: curr}
+				curr.Children[char] = child // add new node to trie if this part of prefix not in trie
+			}
+			curr = child
 		}
-		curr = child
+		if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
+			curr.SearchResults = append(curr.SearchResults, searchResult)
+		}
+		t.mx.Unlock()
 	}
-	if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
-		curr.SearchResults = append(curr.SearchResults, searchResult)
-	}
-	t.mx.Unlock()
 }
 
 func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) bool {
