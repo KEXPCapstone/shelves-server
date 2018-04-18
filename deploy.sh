@@ -40,4 +40,3 @@ ssh root@api.kexpshelves.com << HERE
 	kexpcapstone/gateway
 	exit
 HERE
-
