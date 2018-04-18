@@ -86,7 +86,7 @@ func main() {
 	mux.Handle("/v1/library/releases/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 
 	corsHandler := handlers.NewCorsHandler(mux)
-	fmt.Printf("Gateway server has been started at http://%s\n", addr)
+	fmt.Printf("'Gateway' server has been started at http://%s\n", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, tlsCert, tlsKey, corsHandler)) // report if any errors occur
 }
 
