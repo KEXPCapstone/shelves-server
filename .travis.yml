@@ -5,7 +5,8 @@ services:
 - mongodb
 - docker
 before_install:
-- openssl aes-256-cbc -K $encrypted_f9907a2bc3a1_key -iv $encrypted_f9907a2bc3a1_iv -in deploy_key.enc -out ./deploy_key -d
+- openssl aes-256-cbc -K $encrypted_f9907a2bc3a1_key -iv $encrypted_f9907a2bc3a1_iv
+  -in deploy_key.enc -out ./deploy_key -d
 - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
 - docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
 - docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
@@ -14,11 +15,11 @@ git:
 deploy:
   provider: script
   skip_cleanup: true
-  script: chmod 600 deploy_key && ssh -o StrictHostKeyChecking=no -i deploy_key root@104.131.43.177
-    ./deploy.sh
+  script: chmod 600 deploy_key && ssh -v -o StrictHostKeyChecking=no -i deploy_key
+    root@104.131.43.177 ./deploy.sh
   on:
     branch: master
 env:
   global:
-  - secure: dI2C37gPjiQf2zksvPUOxRLWW1eSSsVcPvKBkkvbeLp/i3qMvqCnBAIDc/C71FsrdfK8fWlbcvyu/BT6vFBsUE017Kp2sNMMp/J6G7HKkjxVjPSO3+b1zEdeSKfM/iXYed8qhbD+ZOYG8FhAkxq6pQvTLs6QitHAoSjcMJvOExL9A4gm6mcPqdvCGIkFK1BToq1jrjGglvUPgl8qz79ogAqWYArBAOW9QKaY/OvE4Lbd5I1Nqg8kj5Qq2pVnnAx+CUegwjZ5RGLB605lXqyEdGUYQxZ8bMvC0An+t8FeHCmAYnXC26o401RpC3mqhFYO/XC8ZGk3QcuNJvTMVBeI5z8onqEmey4Z9hGSfH4/Zfmq8KD37be8H+tSgQ3J4N5rxd+sV1XivzdXbKNe3hX/gTsOFJ9fFsbjhYrD9mgkYU1NLmOQ2k+2cW9X7Zw2MIkf4fI/mwOhROAkl3vCyzyo4Mxs4Ba9vlHudsq8a2gC6kuwNXF7hjrfeS+/c4D21YfWV2b6C7s8wqv4gge/Mvususf61JFosD0paGQasMKV1m0waQ17nlY9qBEKks2rGLEu8r+Tl4h8B0gAAvt1EPxpI+sAenVyAAIV3biNjywiuQmi8qEz65q5q4q4K6DjXZimseH3Zw3Yp7zUoLgEM+SmZbLNrm/q9lH9P3Q9fmlMPQU=
-  - secure: WPzIGl1wpmcxue91IjDgtuYifD/JJO/g+Hmn8/+AufPjU6UIBPl2KJ2XOMa9k+qulMCE8LpBSCFc6KuqHqKxvEgmi3bbQrnqw7kV0O+aB45cEnNtP3BPtDRd4BEcP4tgssakkJtKAnz2Pbs2vduacSF7cQJy0c2U3nHFhJZu+a1D5DfeEALmWus8v2OrXw6kkoNM4cib124Aadz5cM556smSXcz9s04AATdDlCMXJODyVgPAeyELElg1lI8Nvgg5xmiBpJrz8BfNykM2z2/vhPP1KS58EyQsCgY6DQ7jMVnJcBCr0iXYZxPGyyYct9yC/Q54Qnb45eSOduSMb14rr2/KLqX6JvG+3MUa8R/NfxWk1or1wglhzn3jBYR8cEvEvKpsIFeY8WL8O1DzFtOvNlFrYXlb6dMrzJ9v/Kg58OHvYNgIOhDwUjDsSrN5LoW6tfMmr3YXKyq9fPhveumXMn3hzFxw9n57Nwx5UyjYNnXZWrUu/mdOcYWNsrOzy2q52UMQXUKEcUhxrewB7b6GxnIBs3dhdo9Ua5KZtuaq4JHmj5KPgYIziSbONPjjZ8rj1QSpm4jZVK44nGqqSY0fYnEFBntBhJTjEQThxmPEn00NNkwt9cJCuUMj+Jrovc5Jj+mlA3r0IGz9TqefP1CxZXruEP3P2c0tB0womhvFL7w=
+  - secure: rbmke7VgjnP+AwWn96iKi0Fd1GId/tKGb19agMYC5NzwmHg6Yi8DJ5giSPcDL/X0yoEn5oP8ck2Pkf6mxUY6MAY0wA5luq7LDtWGx/X7fhG3biPF6ZmogLVNI7VF1qDw0Hr2qsYwEXTmyTeapQvKKtN4sm/QaiLCEkARqYScHHDravj/DIn+fW8OoZWXNysZAqdpCTYT7apVqlXiIJ/Dll8e+AFrPYVZ2vHyejoC9OGmTALpSVhIZ18xwp0zH9KhcYZeUAdLW9o7MWbJB0mqxuqQ1mpOOhhHvOEI19hioi2Mswn9SLHO28XKRb/5VQB20NaB3nnzWBBAtSUlgoB/opgEQUabzfjGB7z9LCVgCuOuvZb/cikpaVUGzD3PL87DQw6LfmOfxk+tifcaRhaYzkKLF+5MTWo1sblBQXCvffVMS+Fn8B2S21MfDYciedvhDyJczw3yaW8fwhSos7rQlZM5mvI03mpOVfuFNQK+bZH/x4/yMu3hBGlj/5K9jzkE9qrFB+pcG4+3/xGBtDLav2MR8YfI/+j04wJW0jUa8MO2ZnFKBwqzRGxPVtpUgldWA//kXpQ84RqCHTYmGkqDOCcImoSgHAYU18iRplxWgkug+ZJzIqBluTqUHI6FSLsbXcf3Y6X3EzPz4LTxzn9plpFDsiqKLCBqFf3MUJ0W/lE=
+  - secure: Bd6hlmqJxtFrjQUJRiTbZXlHT4I2jGq/zWvf7+muBbDluHr5X2au3c1F0pUU/cthuCJD0aufxW3vjBK2dkBzmfuGlHhen4gsv6uIOAIbgG8cHWXLH9rh2LksqmgxjB59aSBsVExrWPE6KviMQSdkp+CfEGA1THRSdhj+Qa+3RxHNuJua3wbUa7ieiOU1lwWPvSOKGnL2md9SMI6YZ96qsHutHExPr/QbWxzQ9D8jd1YLCjdPdnHe2WqNBfGpgbRNXYdC63DmhZyHb8vSphKs6rB2m78UrIW5v1mVud/c3VeUTeo/1Y7Q7BDVkBieIBxNjoGUu/PdejLYjA/cSx4EvNM1ZW36+D3VxoX94sz+yZMHuztCzpU/zMpS30xZiHbwa+My9/8E95YnDPfi9Xw8HskWW/18iDmZDRU1OdG+UuqPzK7b5UA3W96aPx2Qvye3ZpzwlkOPnqXQmmwXrrCOlLXlcDWJvtbXNG6E+/dr+pcPv1OmnZBKzA41AvFaGFXMDesdz8SK6oOw5DBdWDXiOCYuL2Yw1xfCJxUv+XUiGY/JFbuZ+xk0MwZsGRReaWnBfKP2aRslMad0tqWKKbNx0yaSDyy994F7Xx6jqJdIQ5sj5J5gwOw3ekKjS8O4AxLSMNeOAziAd9DJuMOBFjgPqEivLim7ikDbyX9GDAAjf5U=
