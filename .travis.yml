@@ -14,8 +14,7 @@ git:
 deploy:
   provider: script
   skip_cleanup: true
-  script: chmod 600 deploy_key && ssh -vvv -o StrictHostKeyChecking=no -i deploy_key
-    root@104.131.43.177 ./deploy.sh
+  script: chmod 600 deploy_key && cat deploy_key && ssh -vvv -o StrictHostKeyChecking=no -i ./deploy_key root@104.131.43.177 ./deploy.sh
   on:
     branch: master
 env:
