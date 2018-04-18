@@ -21,27 +21,33 @@ services:
       - dylan
   mongodb:
     image: "mongo"
+    container_name: mongodb
     volumes:
       - ./data:/data/seeds
     networks:
       - dylan
   redissvr:
     image: "redis"
+    container_name: redissvr
     networks:
       - dylan
-  # library:
-  #   build: library/
-  #   environment:
-  #     - DBADDR=mongodb:27017
-  #     - RELEASEDB=library
-  #     - RELEASECOLL=releases
-  #   networks:
-  #     - dylan
-  # shelves:
-  #   build: shelves/
-  #   environment:
-  #     - DBADDR=mongodb:27017
-  #   networks:
-  #     - dylan
+  library:
+    build: library/
+    container_name: library
+    environment:
+      - DBADDR=mongodb:27017
+      - RELEASEDB=library
+      - RELEASECOLL=releases
+      - ARTISTCOLL=artists
+      - GENRECOLL=genres
+    networks:
+      - dylan
+  shelves:
+    build: shelves/
+    container_name: shelves
+    environment:
+      - DBADDR=mongodb:27017
+    networks:
+      - dylan
 networks:
   dylan:
