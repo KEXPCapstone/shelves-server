@@ -19,9 +19,30 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
 	return userID, nil
 }
 
+func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
+	releases, err := hCtx.shelfStore.GetUserShelves(userID)
+	if err != nil {
+		http.Error(w, fmt.Sprint("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
+		return
+	}
+	respond(w, http.StatusOK, releases)
+}
+
 // /v1/shelves/mine/
 func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Request) {
 	// used for getting just this specific user's shelves
+	switch r.Method {
+	case http.MethodGet:
+		userID, idErr := getUserIDFromRequest(r)
+		if idErr != nil {
+			http.Error(w, "NOT AUTHENTICATED", http.StatusBadRequest)
+			return
+		}
+		hCtx.getUsersShelvesFromID(w, r, userID)
+	default:
+		http.Error(w, "", http.StatusMethodNotAllowed)
+		return
+	}
 }
 
 // /v1/shelves
