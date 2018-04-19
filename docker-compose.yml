@@ -22,14 +22,23 @@ services:
       - dylan
   mongodb:
     image: "mongo"
-    container_name: mongo # to be changed if needed
+    container_name: mongodb # to be changed if needed
+    networks:
+      - dylan
+  mongo-seed:
+    image: "mongo"
+    container_name: mongo-seed
+    links:
+      - mongodb
     volumes:
       - ./data:/data/seeds
+    command:
+      'bash -c "mongoimport --host mongodb --db library --collection releases --type json -v --file /data/seeds/dalet_deploy.json --jsonArray"'
     networks:
       - dylan
   redissvr:
     image: "redis"
-    container_name: redis
+    container_name: redissvr
     networks:
       - dylan
   library:
