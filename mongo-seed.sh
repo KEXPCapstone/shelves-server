@@ -1,4 +1,6 @@
 #!/bin/bash
+# note, for this to work properly in production,
+# this script should be copied to the deployment server
 echo "running mongoimport"
 mongoimport --host mongodb --db library --collection releases --type json -v --file /data/seeds/dalet_deploy.json --jsonArray
 echo "creating artists collection from release data"
