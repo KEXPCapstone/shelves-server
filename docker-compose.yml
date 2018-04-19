@@ -32,8 +32,9 @@ services:
       - mongodb
     volumes:
       - ./data:/data/seeds
+      - ./mongo-seed.sh:/usr/local/bin/mongo-seed.sh
     command:
-      'bash -c "mongoimport --host mongodb --db library --collection releases --type json -v --file /data/seeds/dalet_deploy.json --jsonArray"'
+      - mongo-seed.sh
     networks:
       - dylan
   redissvr:
