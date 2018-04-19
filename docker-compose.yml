@@ -22,14 +22,24 @@ services:
       - dylan
   mongodb:
     image: "mongo"
-    container_name: mongo # to be changed if needed
+    container_name: mongodb # to be changed if needed
+    networks:
+      - dylan
+  mongo-seed:
+    image: "mongo"
+    container_name: mongo-seed
+    links:
+      - mongodb
     volumes:
       - ./data:/data/seeds
+      - ./mongo-seed.sh:/usr/local/bin/mongo-seed.sh
+    command:
+      - mongo-seed.sh
     networks:
       - dylan
   redissvr:
     image: "redis"
-    container_name: redis
+    container_name: redissvr
     networks:
       - dylan
   library:

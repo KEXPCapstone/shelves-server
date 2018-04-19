@@ -17,17 +17,26 @@ services:
     volumes:
       - /etc/letsencrypt:/tls:ro
     container_name: gateway
-  # disabled for now since this would remove the existing container (with all data)
-  # mongodb:
-  #   image: "mongo"
-  #   container_name: mongo
-  #   volumes:
-  #     - /srv/data:/data/seeds # data for populating release library
-  #   networks:
-  #     - dylan
-  # redissvr:
-  #   image: "redis"
-  #   container_name: redis
+  mongodb:
+    image: "mongo"
+    container_name: mongodb # to be changed if needed
+    networks:
+      - dylan
+  mongo-seed:
+    image: "mongo"
+    container_name: mongo-seed
+    links:
+      - mongodb
+    volumes:
+      - /srv/data:/data/seeds # data for populating release library
+      - /root/mongo-seed.sh:/usr/local/bin/mongo-seed.sh
+    command:
+      - mongo-seed.sh
+    networks:
+      - dylan
+  redissvr:
+    image: "redis"
+    container_name: redissvr
   library:
     image: kexpcapstone/librarysvc:prod
     container_name: library

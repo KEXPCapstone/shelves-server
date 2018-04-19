@@ -1,6 +1,9 @@
 # deploy script for continuous deployment
 # after a succesful travis build on branch master
-# this will live on a digital ocean droplet that is the target for our deployment
+# note, for this to work properly in production,
+# this script should be copied to the deployment server
 docker-compose down
 docker-compose pull
 docker-compose up -d
+# clear out unused images
+yes | docker image prune -a
