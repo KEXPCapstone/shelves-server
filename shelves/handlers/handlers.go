@@ -69,8 +69,11 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	HELPER METHODS
 ***/
 
-func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) boolean {
+func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) bool {
 	userID, err := getUserIDFromRequest(r)
+	if err != nil {
+		return false // improve this return, change to err? you want to capture the fact that the user is not authenticated
+	}
 	if userID != shelf.OwnerID {
 		return false
 	}
@@ -90,10 +93,10 @@ func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, err
 	return shelf, nil
 }
 
-func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
+func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	xUserHeader := r.Header.Get(XUser)
 	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
-		return nil, errors.New("NOT AUTHENTICATED")
+		return bson.NewObjectId(), errors.New("NOT AUTHENTICATED")
 	}
 	userID := bson.ObjectIdHex(xUserHeader)
 	return userID, nil
@@ -141,7 +144,7 @@ func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shel
 		http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
 		return
 	}
-	if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
+	if err := hCtx.shelfStore.UpdateShelf(shelf.ID); err != nil {
 		// Undefined behavior
 	}
 	// respond
@@ -152,7 +155,7 @@ func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shel
 		http.Error(w, "You must own the shelf to delete it", http.StatusBadRequest)
 		return
 	}
-	if err := hCtx.shelfStore.DeleteShelf(shelfID); err != nil {
+	if err := hCtx.shelfStore.DeleteShelf(shelf.ID); err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}

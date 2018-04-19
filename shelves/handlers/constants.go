@@ -4,7 +4,7 @@ import "errors"
 
 const XUser = "X-User"
 
-const ErrInvalidShelfID = errors.New("Invalid Shelf ID")
+var ErrInvalidShelfID = errors.New("Invalid Shelf ID")
 
 const headerContentType = "Content-Type"
 
