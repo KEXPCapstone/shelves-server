@@ -10,24 +10,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
-	xUserHeader := r.Header.Get(XUser)
-	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
-		return nil, errors.New("NOT AUTHENTICATED")
-	}
-	userID := bson.ObjectIdHex(xUserHeader)
-	return userID, nil
-}
-
-func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
-	releases, err := hCtx.shelfStore.GetUserShelves(userID)
-	if err != nil {
-		http.Error(w, fmt.Sprint("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
-		return
-	}
-	respond(w, http.StatusOK, releases)
-}
-
 // /v1/shelves/mine/
 func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Request) {
 	// used for getting just this specific user's shelves
@@ -58,6 +40,37 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// /v1/shelves/{id}
+func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	default:
+		http.Error(w, "", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+/***
+	HELPER METHODS
+***/
+
+func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
+	xUserHeader := r.Header.Get(XUser)
+	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
+		return nil, errors.New("NOT AUTHENTICATED")
+	}
+	userID := bson.ObjectIdHex(xUserHeader)
+	return userID, nil
+}
+
+func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
+	releases, err := hCtx.shelfStore.GetUserShelves(userID)
+	if err != nil {
+		http.Error(w, fmt.Sprint("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
+		return
+	}
+	respond(w, http.StatusOK, releases)
+}
+
 func (hCtx *HandlerCtx) getAllShelves(w http.ResponseWriter, r *http.Request) {
 	releases, err := hCtx.shelfStore.GetShelves()
 	if err != nil {
@@ -84,13 +97,4 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, http.StatusCreated, shelf)
-}
-
-// /v1/shelves/{id}
-func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	default:
-		http.Error(w, "", http.StatusMethodNotAllowed)
-		return
-	}
 }
