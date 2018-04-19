@@ -9,6 +9,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// /v1/shelves/mine/
+func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Request) {
+	// used for getting just this specific user's shelves
+}
+
 // /v1/shelves
 func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
