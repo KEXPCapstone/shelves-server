@@ -5,14 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 
 	"github.com/KEXPCapstone/shelves-server/shelves/models"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // /v1/shelves/mine/
+// used for getting just this specific user's shelves
 func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Request) {
-	// used for getting just this specific user's shelves
 	switch r.Method {
 	case http.MethodGet:
 		userID, idErr := getUserIDFromRequest(r)
@@ -42,7 +43,20 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
+	shelfID := path.Base(r.URL.String())
+	if !bson.IsObjectIdHex(shelfID) {
+		http.Error(w, ErrInvalidShelfID, http.StatusBadRequest)
+		return
+	}
+	shelfIDBson := bson.ObjectIdHex(shelfID)
 	switch r.Method {
+	case http.MethodGet:
+		shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, shelf)
 	default:
 		http.Error(w, "", http.StatusMethodNotAllowed)
 		return
