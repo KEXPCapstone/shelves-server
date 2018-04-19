@@ -43,20 +43,40 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
+	// Refactor?
 	shelfID := path.Base(r.URL.String())
 	if !bson.IsObjectIdHex(shelfID) {
 		http.Error(w, ErrInvalidShelfID, http.StatusBadRequest)
 		return
 	}
 	shelfIDBson := bson.ObjectIdHex(shelfID)
+	shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
 	switch r.Method {
 	case http.MethodGet:
-		shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
-		if err != nil {
+		respond(w, http.StatusOK, shelf)
+	case http.MethodPatch:
+		if !currUserIsShelfOwner(r, shelf) {
+			http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
+			return
+		}
+		if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
+			// Undefined behavior
+		}
+
+	case http.MethodDelete:
+		if !currUserIsShelfOwner(r, shelf) {
+			http.Error(w, "You must own the shelf to delete it", http.StatusBadRequest)
+			return
+		}
+		if err := hCtx.shelfStore.DeleteShelf(shelfID); err != nil {
 			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 			return
 		}
-		respond(w, http.StatusOK, shelf)
+		w.Write([]byte("Deleted shelf\n"))
 	default:
 		http.Error(w, "", http.StatusMethodNotAllowed)
 		return
@@ -66,6 +86,14 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 /***
 	HELPER METHODS
 ***/
+
+func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) boolean {
+	userID, err := getUserIDFromRequest(r)
+	if userID != shelf.OwnerID {
+		return false
+	}
+	return true
+}
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
 	xUserHeader := r.Header.Get(XUser)
