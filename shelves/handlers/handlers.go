@@ -41,19 +41,6 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, error) {
-	shelfID := path.Base(r.URL.String())
-	if !bson.IsObjectIdHex(shelfID) {
-		return nil, ErrInvalidShelfID
-	}
-	shelfIDBson := bson.ObjectIdHex(shelfID)
-	shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
-	if err != nil {
-		return nil, err
-	}
-	return shelf, nil
-}
-
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	// Refactor?
@@ -88,6 +75,19 @@ func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) boolean {
 		return false
 	}
 	return true
+}
+
+func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, error) {
+	shelfID := path.Base(r.URL.String())
+	if !bson.IsObjectIdHex(shelfID) {
+		return nil, ErrInvalidShelfID
+	}
+	shelfIDBson := bson.ObjectIdHex(shelfID)
+	shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
+	if err != nil {
+		return nil, err
+	}
+	return shelf, nil
 }
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, nil) {
