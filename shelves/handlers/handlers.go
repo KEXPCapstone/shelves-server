@@ -59,14 +59,7 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		respond(w, http.StatusOK, shelf)
 	case http.MethodPatch:
-		if !currUserIsShelfOwner(r, shelf) {
-			http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
-			return
-		}
-		if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
-			// Undefined behavior
-		}
-
+		hCtx.updateShelf(w, r, shelf)
 	case http.MethodDelete:
 		hCtx.deleteShelf(w, r, shelf)
 	default:
@@ -78,6 +71,17 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 /***
 	HELPER METHODS
 ***/
+
+func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
+	if !currUserIsShelfOwner(r, shelf) {
+		http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
+		return
+	}
+	if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
+		// Undefined behavior
+	}
+	// respond
+}
 
 func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
 	if !currUserIsShelfOwner(r, shelf) {
