@@ -52,6 +52,7 @@ services:
     environment:
       - DBADDR=mongodb:27017
 networks:
-  default:
-    external:
-      name: dylan
+  dylan:
+  # default:
+  #   external:
+  #     name: dylan
