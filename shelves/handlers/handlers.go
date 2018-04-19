@@ -72,29 +72,6 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	HELPER METHODS
 ***/
 
-func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
-	if !currUserIsShelfOwner(r, shelf) {
-		http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
-		return
-	}
-	if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
-		// Undefined behavior
-	}
-	// respond
-}
-
-func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
-	if !currUserIsShelfOwner(r, shelf) {
-		http.Error(w, "You must own the shelf to delete it", http.StatusBadRequest)
-		return
-	}
-	if err := hCtx.shelfStore.DeleteShelf(shelfID); err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte("Deleted shelf\n"))
-}
-
 func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) boolean {
 	userID, err := getUserIDFromRequest(r)
 	if userID != shelf.OwnerID {
@@ -147,4 +124,27 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, http.StatusCreated, shelf)
+}
+
+func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
+	if !currUserIsShelfOwner(r, shelf) {
+		http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
+		return
+	}
+	if err := hCtx.shelfStore.UpdateShelf(shelfID); err != nil {
+		// Undefined behavior
+	}
+	// respond
+}
+
+func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
+	if !currUserIsShelfOwner(r, shelf) {
+		http.Error(w, "You must own the shelf to delete it", http.StatusBadRequest)
+		return
+	}
+	if err := hCtx.shelfStore.DeleteShelf(shelfID); err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte("Deleted shelf\n"))
 }
