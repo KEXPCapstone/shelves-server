@@ -13,7 +13,7 @@ import (
 func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-
+		hCtx.addShelf(w, r)
 	default:
 		http.Error(w, "", http.StatusMethodNotAllowed)
 		return
@@ -26,7 +26,7 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Error decoding JSON into new shelf: %v", err), http.StatusBadRequest)
 		return
 	}
-	shelf, err := ns.ToShelf(bson.NewObjectId())
+	shelf, err := hCtx.shelfStore.InsertNew(ns, bson.NewObjectId())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error when adding new shelf: %v", err), http.StatusBadRequest)
 		return
