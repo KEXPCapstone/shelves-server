@@ -38,7 +38,12 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hCtx *HandlerCtx) getAllShelves(w http.ResponseWriter, r *http.Request) {
-
+	releases, err := hCtx.shelfStore.GetShelves()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error returned fetching shelves: %v", err), http.StatusInternalServerError)
+		return
+	}
+	respond(w, http.StatusOK, releases)
 }
 
 func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
