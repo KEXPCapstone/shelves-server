@@ -27,11 +27,17 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 	ns := &models.NewShelf{}
+	xUserHeader := r.Header.Get(XUser)
+	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
+		http.Error(w, "NOT AUTHENTICATED", http.StatusBadRequest)
+		return
+	}
+	userId := bson.ObjectIdHex(xUserHeader)
 	if err := json.NewDecoder(r.Body).Decode(ns); err != nil {
 		http.Error(w, fmt.Sprintf("Error decoding JSON into new shelf: %v", err), http.StatusBadRequest)
 		return
 	}
-	shelf, err := hCtx.shelfStore.InsertNew(ns, bson.NewObjectId())
+	shelf, err := hCtx.shelfStore.InsertNew(ns, userId)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error when adding new shelf: %v", err), http.StatusBadRequest)
 		return
