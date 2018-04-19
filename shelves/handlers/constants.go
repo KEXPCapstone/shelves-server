@@ -1,5 +1,7 @@
 package handlers
 
+import "errors"
+
 const XUser = "X-User"
 
-const ErrInvalidShelfID = "Invalid Shelf ID"
+const ErrInvalidShelfID = errors.New("Invalid Shelf ID")

@@ -41,17 +41,27 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// /v1/shelves/{id}
-func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
-	// Refactor?
+func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, error) {
 	shelfID := path.Base(r.URL.String())
 	if !bson.IsObjectIdHex(shelfID) {
-		http.Error(w, ErrInvalidShelfID, http.StatusBadRequest)
-		return
+		return nil, ErrInvalidShelfID
 	}
 	shelfIDBson := bson.ObjectIdHex(shelfID)
 	shelf, err := hCtx.shelfStore.GetShelfById(shelfIDBson)
 	if err != nil {
+		return nil, err
+	}
+	return shelf, nil
+}
+
+// /v1/shelves/{id}
+func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
+	// Refactor?
+	shelf, err := hCtx.getShelfFromRequest(r)
+	if err == ErrInvalidShelfID {
+		http.Error(w, fmt.Sprintf("%v", ErrInvalidShelfID), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
