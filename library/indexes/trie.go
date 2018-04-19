@@ -2,6 +2,7 @@ package indexes
 
 import (
 	"errors"
+	"log"
 	"sort"
 	"sync"
 	"unicode/utf8"
@@ -27,26 +28,27 @@ func CreateTrieRoot() *TrieNode {
 }
 
 func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
-	if len(prefix) > 0 {
-		t.mx.Lock()
-		curr := t
-		for _, char := range prefix {
-			if curr.Children == nil {
-				curr.Children = make(map[rune]*TrieNode)
-			}
 
-			child, ok := curr.Children[char]
-			if !ok {
-				child = &TrieNode{Key: char, Parent: curr}
-				curr.Children[char] = child // add new node to trie if this part of prefix not in trie
-			}
-			curr = child
+	t.mx.Lock()
+	curr := t
+	for _, char := range prefix {
+		log.Println(string(char))
+		if curr.Children == nil {
+			curr.Children = make(map[rune]*TrieNode)
 		}
-		if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
-			curr.SearchResults = append(curr.SearchResults, searchResult)
+
+		child, ok := curr.Children[char]
+		if !ok {
+			child = &TrieNode{Key: char, Parent: curr}
+			curr.Children[char] = child // add new node to trie if this part of prefix not in trie
 		}
-		t.mx.Unlock()
+		curr = child
 	}
+	if !t.nodeContainsRelease(curr, searchResult.ReleaseID) {
+		curr.SearchResults = append(curr.SearchResults, searchResult)
+	}
+	t.mx.Unlock()
+
 }
 
 func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) bool {
