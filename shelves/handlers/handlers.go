@@ -27,12 +27,18 @@ func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Reques
 // /v1/shelves
 func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	case http.MethodGet:
+		hCtx.getAllShelves(w, r)
 	case http.MethodPost:
 		hCtx.addShelf(w, r)
 	default:
 		http.Error(w, "", http.StatusMethodNotAllowed)
 		return
 	}
+}
+
+func (hCtx *HandlerCtx) getAllShelves(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
