@@ -85,8 +85,19 @@ func main() {
 	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 
 	corsHandler := handlers.NewCorsHandler(mux)
+	log.Println("Starting to redirect http traffic to https")
+	go func() {
+		if err := http.ListenAndServe(":80", http.HandlerFunc(redirectTLS)); err != nil {
+			log.Fatalf("HTTP ListenAndServe error: %v", err)
+		}
+	}()
+
 	fmt.Printf("'Gateway' server has been started at http://%s\n", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, tlsCert, tlsKey, corsHandler)) // report if any errors occur
+}
+
+func redirectTLS(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 }
 
 func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
