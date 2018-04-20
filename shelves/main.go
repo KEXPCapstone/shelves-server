@@ -15,7 +15,7 @@ func main() {
 
 	// TODO: Register handlers on mux
 
-	log.Printf("Shelves microservice is listening at http://%s...", addr)
+	log.Printf("The 'shelves' microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))
 }
 

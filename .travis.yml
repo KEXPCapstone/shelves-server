@@ -1,7 +1,28 @@
 language: go
 go:
-  - 1.x
+- 1.x
 services:
-  - mongodb
+- mongodb
+- docker
+before_install:
+- openssl aes-256-cbc -K $encrypted_f9907a2bc3a1_key -iv $encrypted_f9907a2bc3a1_iv
+  -in shelves_deploy_key.enc -out ./shelves_deploy_key -d
+- docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
 git:
   depth: 3
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: docker-compose -f docker-compose.yml -f docker-compose.prod.yml build && docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: chmod 600 shelves_deploy_key && ssh -vvv -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
+      -i ./shelves_deploy_key root@104.131.43.177 ./deploy.sh
+    on:
+      branch: master
+env:
+  global:
+  - secure: kdzxfKkWsCCH2P6b36HxiuHB10hE5YIEZLwZBL9AbYWqdZsNUdyuo/4EKangDQaGEuEq/lRDOGpRTioPltCzr1Bj9+3L4z4mSdUATf03HuKPxeR5jXnPdUgBCurC6wh+Q1jANE2EyzZ6YdKNapHqtuIOiuuRersaXOlZPcB9H/93WPqce5iDZ8zg7DD4iNOuflJKQNxjswgWOtNvvH99Qqc/65aShUH9l3UO1G4EJe7O2bIGOMhwyU914+Potj/qCTEhrmtW4oYqmCl9x+PuQSVTC4yoZRXDh81XrvIPYZACU+mBhwoLh/cNppxLjkecSU+nRE6T3wd+0lrhVXttIVzH8kmEe1TTDsfvwEF03r5vUDBW9Bihu0LvDf340tg/9J1dp9/h56Um4KMvgJUZN8/3lEjfrMRPtgyRQfGZeCVKhLcEqvSjzTiS4Dhrs5fEwZyvM7AQuBKXezN9jS0nRCdCFOA7JAKaep2R5YBZVf9ShcF3823yqEyTAlT8Za5Ikh3xK+mi3WnIPaF2NnQHmCJ7bClbggTy7YnDUM0NQ+FohylknieErJhTJBzqyJkmM/+K7kbc0Q8bCh1AtPE3lEhWJ5ABbu30i69IsAnp84pErgnTiyptohHzDG/8FbfO5mX7+8s7yPZBCUFGpwwahFcn8DSyX/no6GQH28urEEk=
+  - secure: LftNuVhv28Bl/UFqEm/TAEegGrz/9bs6lU9SQIVqV4l9tdkJFYpWAERphL1Tc8wl8USGUFg34sgiBlSGU9JR80g/zFbSlnZ/qu7pqfxYb/gNwf2Sq4PZlgOuRqphlmzN6SVl4e//mScNci7m2KJwVua1ygncQULnX2yRsxNShgCr8VzKpNPpiuUunR0LHGPuVrp6YROk9+MGFwIw0/8rVvr3PukpKUk8L5a7Glb1eB6KJm4PJKyHXryvTCKQuQyX5z4d5Qw+VOFtmBmL15XuIBloOkMIkqnJdMKa1EvuH6zhK9IXVPu/iuvoA7DerQjEuwl48vPgeLogCEE2QwkHoXjikAQnExbSzSioIgeM7TztnwcssuqNyQHxZHldPmJxWlyqumxKGD0dv0NaIC4lBcsOOKxbbofsoSH0Jctu8tuscmnWbhJQKQ77RFFXAr1vb12eFVCRSwjt9OY2+mVoI8NZyqZHh3bUD46rgbWRmVWvWJNMxU41Cgt5v59x4siw+DjcWqklTr+5epDZZRz19/6QqgCan4LupRpHJm7Glpg1mUHYMFwr+0zHVm9uWv0PRdBnCXztB1d3D6dij/vmHWT/xFdYc2nOykmnGry1cWnf116FJ2hZKwki3eKKvhcDlt0tGSKZ6celWynqjTAgJrOZsgZbSvvfDNjF1R+4RhA=

@@ -81,12 +81,11 @@ func main() {
 	// TODO: Unsure if we need repetition with the /
 	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
-	// TODO: May want structure it like /v1/library/release
-	mux.Handle("/v1/library/releases", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
-	mux.Handle("/v1/library/releases/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
+
+	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 
 	corsHandler := handlers.NewCorsHandler(mux)
-	fmt.Printf("Server has been started at http://%s\n", addr)
+	fmt.Printf("'Gateway' server has been started at http://%s\n", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, tlsCert, tlsKey, corsHandler)) // report if any errors occur
 }
 
