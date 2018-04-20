@@ -105,7 +105,7 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
 	releases, err := hCtx.shelfStore.GetUserShelves(userID)
 	if err != nil {
-		http.Error(w, fmt.Sprint("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
 		return
 	}
 	respond(w, http.StatusOK, releases)
