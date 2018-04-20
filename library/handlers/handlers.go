@@ -96,8 +96,31 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 }
 
 // ArtistsHandler path: /v1/library/artists
+// :param: last_id, the id of the last artist (string artist name)
+// :param: limit, the max number of artists to return
 func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
-	return
+	switch r.Method {
+	case http.MethodGet:
+		lastID := r.URL.Query().Get("last_id")
+		limit := r.URL.Query().Get("limit")
+
+		intLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			// for now this is a 500
+			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
+			return
+		}
+		releases, err := hCtx.libraryStore.GetArtists(lastID, intLimit)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Could not get artists: %v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, releases)
+
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
 }
 
 // GenresHandler path: /v1/library/genres

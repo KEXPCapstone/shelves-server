@@ -103,7 +103,7 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 
 // GetArtists returns artists in the library greater than 'lastID'
 // 'limit' specifies the max # of docs to return
-func (ms *MongoStore) GetArtists(lastID bson.ObjectId, limit int) ([]*Artist, error) {
+func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
 	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&artists); err != nil {
