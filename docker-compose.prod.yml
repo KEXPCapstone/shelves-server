@@ -17,6 +17,8 @@ services:
     volumes:
       - /etc/letsencrypt:/tls:ro
     container_name: gateway
+    networks:
+      - dylan
   mongodb:
     image: "mongo"
     container_name: mongodb # to be changed if needed
@@ -37,6 +39,8 @@ services:
   redissvr:
     image: "redis"
     container_name: redissvr
+    networks:
+      - dylan
   library:
     image: kexpcapstone/librarysvc:prod
     container_name: library
@@ -46,11 +50,15 @@ services:
       - RELEASECOLL=releases
       - ARTISTCOLL=artists
       - GENRECOLL=genres
+    networks:
+      - dylan
   shelves:
     image: kexpcapstone/shelvessvc:prod
     container_name: shelves
     environment:
       - DBADDR=mongodb:27017
+    networks:
+      - dylan
 networks:
   dylan:
   # default:
