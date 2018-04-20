@@ -15,6 +15,7 @@ services:
       - SESSIONKEY=blackcoffee
     ports:
       - "443:443"
+      - "80:80"
     volumes:
       - ./tls:/tls:ro
     container_name: gateway
