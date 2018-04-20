@@ -95,3 +95,7 @@ func (ms *MgoStore) CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, e
 	}
 	return copied, nil
 }
+
+func (ms *MgoStore) ExportShelf(id bson.ObjectId) error {
+	return nil
+}
