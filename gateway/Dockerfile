@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o gatewaysvc .
 FROM alpine:latest as runner
 RUN apk add --no-cache ca-certificates
 WORKDIR /root/
-EXPOSE 443 80
+EXPOSE 443
 COPY --from=builder /go/src/github.com/KEXPCapstone/shelves-server/gateway .
 ENTRYPOINT ["./gatewaysvc"]
