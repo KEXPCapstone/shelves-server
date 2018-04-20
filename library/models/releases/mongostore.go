@@ -93,6 +93,9 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
+		t.AddToTrie(strings.ToLower(release.KEXPDateReleased), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPDateReleased"})
+		t.AddToTrie(strings.ToLower(release.KEXPTitle), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPTitle"})
+
 	}
 
 	if err := iter.Close(); err != nil {
@@ -103,7 +106,7 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 
 // GetArtists returns artists in the library greater than 'lastID'
 // 'limit' specifies the max # of docs to return
-func (ms *MongoStore) GetArtists(lastID bson.ObjectId, limit int) ([]*Artist, error) {
+func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
 	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&artists); err != nil {

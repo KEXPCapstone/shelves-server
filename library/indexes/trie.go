@@ -27,6 +27,7 @@ func CreateTrieRoot() *TrieNode {
 }
 
 func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
+
 	t.mx.Lock()
 	curr := t
 	for _, char := range prefix {
@@ -45,6 +46,7 @@ func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
 		curr.SearchResults = append(curr.SearchResults, searchResult)
 	}
 	t.mx.Unlock()
+
 }
 
 func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) bool {
