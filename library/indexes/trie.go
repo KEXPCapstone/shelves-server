@@ -2,7 +2,6 @@ package indexes
 
 import (
 	"errors"
-	"log"
 	"sort"
 	"sync"
 	"unicode/utf8"
@@ -32,7 +31,6 @@ func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
 	t.mx.Lock()
 	curr := t
 	for _, char := range prefix {
-		log.Println(string(char))
 		if curr.Children == nil {
 			curr.Children = make(map[rune]*TrieNode)
 		}
