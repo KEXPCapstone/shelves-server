@@ -40,6 +40,28 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// /v1/shelves/user/{userID}
+func (hCtx *HandlerCtx) UserShelvesHandler(w http.ResponseWriter, r *http.Request) {
+	userID := path.Base(r.URL.String())
+	if !bson.IsObjectIdHex(userID) {
+		http.Error(w, InvalidUserID, http.StatusBadRequest)
+		return
+	}
+	userIDBson := bson.ObjectIdHex(userID)
+	switch r.Method {
+	case http.MethodGet:
+		shelves, err := hCtx.shelfStore.GetUserShelves(userIDBson)
+		if err != nil {
+			http.Error(w, err, http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, shelves)
+	default:
+		http.Error(w, UserShelvesHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	shelf, err := hCtx.getShelfFromRequest(r)
