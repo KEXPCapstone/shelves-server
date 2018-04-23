@@ -18,7 +18,7 @@ const ShelvesMineHandlerMethodNotAllowed = "Only allowed to 'GET' from this reso
 
 const ShelvesHandlerMethodNotAllowed = "Only allowed to 'GET' or 'POST' to this resource."
 
-const ShelfHandlerMethodNotAllowed = "Only allowd to 'GET', 'PATCH', or 'DELETE' to this resource."
+const ShelfHandlerMethodNotAllowed = "Only allowd to 'GET', 'PUT', or 'DELETE' to this resource."
 
 const ErrMustBeOwnerToEdit = "You must own the shelf to edit it."
 

@@ -53,7 +53,7 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		respond(w, http.StatusOK, shelf)
-	case http.MethodPatch:
+	case http.MethodPut:
 		hCtx.updateShelf(w, r, shelf)
 	case http.MethodDelete:
 		hCtx.deleteShelf(w, r, shelf)
