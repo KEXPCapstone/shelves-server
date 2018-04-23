@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -18,12 +17,12 @@ func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Reques
 	case http.MethodGet:
 		userID, idErr := getUserIDFromRequest(r)
 		if idErr != nil {
-			http.Error(w, "NOT AUTHENTICATED", http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("%v", idErr), http.StatusBadRequest)
 			return
 		}
 		hCtx.getUsersShelvesFromID(w, r, userID)
 	default:
-		http.Error(w, "", http.StatusMethodNotAllowed)
+		http.Error(w, ShelvesMineHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -36,14 +35,13 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		hCtx.addShelf(w, r)
 	default:
-		http.Error(w, "", http.StatusMethodNotAllowed)
+		http.Error(w, ShelvesHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 }
 
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
-	// Refactor?
 	shelf, err := hCtx.getShelfFromRequest(r)
 	if err == ErrInvalidShelfID {
 		http.Error(w, fmt.Sprintf("%v", ErrInvalidShelfID), http.StatusBadRequest)
@@ -60,7 +58,7 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		hCtx.deleteShelf(w, r, shelf)
 	default:
-		http.Error(w, "", http.StatusMethodNotAllowed)
+		http.Error(w, ShelfHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 }
@@ -96,7 +94,7 @@ func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, err
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	xUserHeader := r.Header.Get(XUser)
 	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
-		return bson.NewObjectId(), errors.New("NOT AUTHENTICATED")
+		return bson.NewObjectId(), ErrInvalidXUser
 	}
 	userID := bson.ObjectIdHex(xUserHeader)
 	return userID, nil
@@ -105,7 +103,7 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
 	releases, err := hCtx.shelfStore.GetUserShelves(userID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error returned fetching user's shelves: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
 	respond(w, http.StatusOK, releases)
@@ -114,7 +112,7 @@ func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Req
 func (hCtx *HandlerCtx) getAllShelves(w http.ResponseWriter, r *http.Request) {
 	releases, err := hCtx.shelfStore.GetShelves()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error returned fetching shelves: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
 	respond(w, http.StatusOK, releases)
@@ -124,16 +122,16 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 	ns := &models.NewShelf{}
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
-		http.Error(w, "NOT AUTHENTICATED", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
 	if err := json.NewDecoder(r.Body).Decode(ns); err != nil {
-		http.Error(w, fmt.Sprintf("Error decoding JSON into new shelf: %v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v : %v", ErrEncodingJSON, err), http.StatusBadRequest)
 		return
 	}
 	shelf, err := hCtx.shelfStore.InsertNew(ns, userID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error when adding new shelf: %v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
 	respond(w, http.StatusCreated, shelf)
@@ -141,7 +139,7 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 
 func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
 	if !currUserIsShelfOwner(r, shelf) {
-		http.Error(w, "You must own the shelf to edit it", http.StatusBadRequest)
+		http.Error(w, ErrMustBeOwnerToEdit, http.StatusBadRequest)
 		return
 	}
 	if err := hCtx.shelfStore.UpdateShelf(shelf.ID); err != nil {
@@ -152,12 +150,12 @@ func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shel
 
 func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {
 	if !currUserIsShelfOwner(r, shelf) {
-		http.Error(w, "You must own the shelf to delete it", http.StatusBadRequest)
+		http.Error(w, ErrMustBeOwnerToDelete, http.StatusBadRequest)
 		return
 	}
 	if err := hCtx.shelfStore.DeleteShelf(shelf.ID); err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("Deleted shelf\n"))
+	w.Write([]byte(DeletedShelfConf))
 }
