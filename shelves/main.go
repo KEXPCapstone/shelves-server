@@ -44,7 +44,7 @@ func main() {
 	hCtx := handlers.NewHandlerContext(mongoStore)
 	mux.HandleFunc("/v1/shelves", hCtx.ShelvesHandler)
 	mux.HandleFunc("/v1/shelves/mine", hCtx.ShelvesMineHandler)
-	mux.HandleFunc("/v1/shelves/users/", handler)
+	mux.HandleFunc("/v1/shelves/users/", hCtx.UserShelvesHandler)
 	mux.HandleFunc("/v1/shelves/", hCtx.ShelfHandler)
 
 	log.Printf("The 'shelves' microservice is listening at http://%s...", addr)

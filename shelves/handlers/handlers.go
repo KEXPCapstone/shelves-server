@@ -52,7 +52,7 @@ func (hCtx *HandlerCtx) UserShelvesHandler(w http.ResponseWriter, r *http.Reques
 	case http.MethodGet:
 		shelves, err := hCtx.shelfStore.GetUserShelves(userIDBson)
 		if err != nil {
-			http.Error(w, err, http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 			return
 		}
 		respond(w, http.StatusOK, shelves)
