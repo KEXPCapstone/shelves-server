@@ -40,7 +40,7 @@ func (hCtx *HandlerCtx) ShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// /v1/shelves/user/{userID}
+// /v1/shelves/users/{userID}
 func (hCtx *HandlerCtx) UserShelvesHandler(w http.ResponseWriter, r *http.Request) {
 	userID := path.Base(r.URL.String())
 	if !bson.IsObjectIdHex(userID) {
