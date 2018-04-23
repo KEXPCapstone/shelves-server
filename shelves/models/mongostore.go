@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -70,7 +70,11 @@ func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 }
 
 // TODO: Evaluate best means of updating; replacing or patching
-func (ms *MgoStore) UpdateShelf(id bson.ObjectId) error {
+func (ms *MgoStore) UpdateShelf(id bson.ObjectId, replacementShelf *Shelf) error {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.UpdateId(id, replacementShelf); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -94,4 +98,8 @@ func (ms *MgoStore) CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, e
 		return nil, err
 	}
 	return copied, nil
+}
+
+func (ms *MgoStore) ExportShelf(id bson.ObjectId) error {
+	return nil
 }
