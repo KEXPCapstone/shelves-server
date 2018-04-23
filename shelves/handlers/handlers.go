@@ -126,7 +126,7 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.NewDecoder(r.Body).Decode(ns); err != nil {
-		http.Error(w, fmt.Sprintf("%v : %v", ErrEncodingJSON, err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
 	}
 	shelf, err := hCtx.shelfStore.InsertNew(ns, userID)
@@ -142,10 +142,17 @@ func (hCtx *HandlerCtx) updateShelf(w http.ResponseWriter, r *http.Request, shel
 		http.Error(w, ErrMustBeOwnerToEdit, http.StatusBadRequest)
 		return
 	}
-	if err := hCtx.shelfStore.UpdateShelf(shelf.ID); err != nil {
-		// Undefined behavior
+	replacementShelf := &models.Shelf{}
+	if err := json.NewDecoder(r.Body).Decode(replacementShelf); err != nil {
+		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
+		return
 	}
-	// respond
+
+	if err := hCtx.shelfStore.UpdateShelf(shelf.ID, replacementShelf); err != nil {
+		http.Error(w, fmt.Sprintf("%v : %v", ErrUpdateShelf, err), http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(UpdatedShelfConf))
 }
 
 func (hCtx *HandlerCtx) deleteShelf(w http.ResponseWriter, r *http.Request, shelf *models.Shelf) {

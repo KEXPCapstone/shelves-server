@@ -21,7 +21,7 @@ type ShelfStore interface {
 	// TODO: Will accept a typeof 'Shelf' and replace exisiting shelf
 	// at id with that new Shelf
 	// "PUT /v1/shelves/{id}"
-	UpdateShelf(id bson.ObjectId) error
+	UpdateShelf(id bson.ObjectId, replacementShelf *Shelf) error
 
 	// "DELETE /v1/shelves/{id}"
 	DeleteShelf(id bson.ObjectId) error

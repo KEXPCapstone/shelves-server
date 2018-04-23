@@ -12,6 +12,8 @@ const contentTypeJSON = "application/json"
 
 const ErrEncodingJSON = "Error converting response value to JSON: "
 
+const ErrDecodingJSON = "Error decoding request body: "
+
 var ErrInvalidXUser = errors.New("Invalid ID in X-User header. You may have been signed out.")
 
 const ShelvesMineHandlerMethodNotAllowed = "Only allowed to 'GET' from this resource."
@@ -24,4 +26,8 @@ const ErrMustBeOwnerToEdit = "You must own the shelf to edit it."
 
 const ErrMustBeOwnerToDelete = "You must own the shelf to delete it."
 
-const DeletedShelfConf = "Deleted shelf\n"
+const DeletedShelfConf = "Successfully deleted shelf\n"
+
+const ErrUpdateShelf = "Error encountered updating shelf"
+
+const UpdatedShelfConf = "Successfully Updated shelf\n"
