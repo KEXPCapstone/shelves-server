@@ -63,7 +63,7 @@ func (ms *MgoStore) GetShelfById(id bson.ObjectId) (*Shelf, error) {
 func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	shelves := []*Shelf{}
-	if err := coll.Find(bson.M{"OwnerID": userId}).All(&shelves); err != nil {
+	if err := coll.Find(bson.M{"ownerid": userId}).All(&shelves); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
 	}
 	return shelves, nil
