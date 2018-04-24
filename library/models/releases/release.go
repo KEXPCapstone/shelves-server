@@ -19,7 +19,7 @@ type Release struct {
 	KEXPReleaseGroupMBID    string        `json:"KEXPReleaseGroupMBID" bson:"KEXPReleaseGroupMBID"`
 	KEXPReleaseArtistCredit string        `json:"KEXPReleaseArtistCredit" bson:"KEXPReleaseArtistCredit"`
 	LabelInfo               []interface{} `json:"labelInfo" bson:"label-info"`
-	Media                   string        `json:"media" bson:"media"`
+	Media                   []interface{} `json:"media" bson:"media"`
 	Status                  string        `json:"status" bson:"status"`
 	Disambiguation          string        `json:"disambiguation" bson:"disambiguation"`
 	Barcode                 string        `json:"barcode" bson:"barcode"`
