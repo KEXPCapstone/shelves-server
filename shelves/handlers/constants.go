@@ -35,3 +35,5 @@ const UpdatedShelfConf = "Successfully Updated shelf\n"
 const UserShelvesHandlerMethodNotAllowed = "Only allowed to 'GET' from this resource."
 
 const InvalidUserID = "Invalid user ID in request URL."
+
+const FeaturedShelvesHandlerMethodNotAllowed = "Only allowed to 'GET' from this resource."
