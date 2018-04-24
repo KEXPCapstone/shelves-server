@@ -6,7 +6,7 @@ import (
 	"sync"
 	"unicode/utf8"
 
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 type TrieNode struct {

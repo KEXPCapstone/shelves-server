@@ -1,7 +1,7 @@
 package releases
 
 import (
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 // Artist represents an artist in the KEXP library, with additional

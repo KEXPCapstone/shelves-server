@@ -3,7 +3,7 @@ package releases
 import (
 	"strings"
 
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	mgo "gopkg.in/mgo.v2"

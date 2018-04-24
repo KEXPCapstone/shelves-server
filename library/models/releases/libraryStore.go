@@ -3,7 +3,7 @@ package releases
 // TODO: general interface should be agnostic of mgo types
 import (
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"gopkg.in/mgo.v2/bson"
 )
 
