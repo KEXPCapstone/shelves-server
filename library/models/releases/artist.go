@@ -1,9 +1,5 @@
 package releases
 
-import (
-	"github.com/google/uuid"
-)
-
 // Artist represents an artist in the KEXP library, with additional
 // information about associated releases
 type Artist struct {
@@ -14,7 +10,7 @@ type Artist struct {
 
 // ReleaseSummary represents a summary of a given release with minimal metadata
 type ReleaseSummary struct {
-	ReleaseMBID uuid.UUID `json:"releaseMBID" bson:"ReleaseMBID"`
-	Title       string    `json:"title" bson:"title"`
+	ReleaseMBID string `json:"releaseMBID" bson:"ReleaseMBID"`
+	Title       string `json:"title" bson:"title"`
 	// ... more fields to be added as needed
 }

@@ -20,8 +20,8 @@ type Release struct {
 	KEXPReleaseArtistCredit string        `json:"KEXPReleaseArtistCredit" bson:"KEXPReleaseArtistCredit"`
 	LabelInfo               []interface{} `json:"labelInfo" bson:"label-info"`
 	Media                   string        `json:"media" bson:"media"`
-	Status                  string        `json: "status" bson: "status"`
-	Disambiguation          string        `json: "disambiguation" bson: "disambiguation"`
+	Status                  string        `json:"status" bson:"status"`
+	Disambiguation          string        `json:"disambiguation" bson:"disambiguation"`
 	Barcode                 string        `json:"barcode" bson:"barcode"`
 	Packaging               string        `json:"packaging" bson:"packaging"`
 	Date                    string        `json:"date" bson:"date"`
