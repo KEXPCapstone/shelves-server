@@ -11,7 +11,6 @@ type Shelf struct {
 	ID           bson.ObjectId   `json:"id" bson:"_id"`
 	OwnerID      bson.ObjectId   `json:"ownerId"` // TODO: May have to also add bson tag here
 	Name         string          `json:"name"`
-	Deleted      bool            `json:"-"` // store, but don't encode
 	ReleaseIDs   []bson.ObjectId `json:"releaseIDs"`
 	Description  string          `json:"description"` // Maybe
 	DateCreated  time.Time       `json:"dateCreated"`
@@ -40,7 +39,6 @@ func (ns *NewShelf) ToShelf(userID bson.ObjectId) (*Shelf, error) {
 		ID:           bson.NewObjectId(),
 		OwnerID:      userID,
 		Name:         ns.Name,
-		Deleted:      false,
 		ReleaseIDs:   []bson.ObjectId{},
 		Description:  ns.Description,
 		DateCreated:  time.Now(),
