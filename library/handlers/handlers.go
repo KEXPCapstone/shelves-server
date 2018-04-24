@@ -11,11 +11,12 @@ import (
 )
 
 // ReleasesHandler path: /v1/library/releases
+// :param: last_id, id of the last release the client saw, for pagination
+// :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		// TODO
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	case http.MethodGet:
@@ -24,7 +25,6 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 
 		intLimit, err := strconv.Atoi(limit)
 		if err != nil {
-			// for now this is a 500
 			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
 			return
 		}
