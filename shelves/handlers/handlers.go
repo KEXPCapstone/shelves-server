@@ -62,6 +62,16 @@ func (hCtx *HandlerCtx) UserShelvesHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+// v1/shelves/featured
+func (hCtx *HandlerCtx) FeaturedShelvesHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+	default:
+		http.Error(w, FeaturedShelvesHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 // /v1/shelves/{id}
 func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	shelf, err := hCtx.getShelfFromRequest(r)
