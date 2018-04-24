@@ -3,6 +3,7 @@ package releases
 // TODO: general interface should be agnostic of mgo types
 import (
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
+	"github.com/satori/go.uuid"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -14,10 +15,10 @@ type LibraryStore interface {
 	AddRelease(release *Release) (*Release, error)
 
 	// return all releases in the library
-	GetReleases(lastID bson.ObjectId, limit int) ([]*Release, error)
+	GetReleases(lastID uuid.UUID, limit int) ([]*Release, error)
 
 	// return a single release with the supplied id
-	GetReleaseByID(id bson.ObjectId) (*Release, error)
+	GetReleaseByID(id uuid.UUID) (*Release, error)
 
 	// return a slice of releases matching the given field value
 	GetReleasesByField(field string, value string) ([]*Release, error)
@@ -26,7 +27,7 @@ type LibraryStore interface {
 	GetArtists(lastID string, limit int) ([]*Artist, error)
 
 	// return a specific artist with the supplied musicbrainz artist MBID
-	GetArtistByMBID(id string) (*Artist, error)
+	GetArtistByMBID(id uuid.UUID) (*Artist, error)
 
 	// return all genres in the library
 	GetGenres(lastID bson.ObjectId, limit int) ([]*Genre, error)

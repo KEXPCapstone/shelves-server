@@ -6,7 +6,7 @@ import (
 	"sync"
 	"unicode/utf8"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/satori/go.uuid"
 )
 
 type TrieNode struct {
@@ -18,8 +18,8 @@ type TrieNode struct {
 }
 
 type SearchResult struct {
-	ReleaseID      bson.ObjectId `json:"releaseID"`
-	FieldMatchedOn string        `json:"fieldMatchedOn"`
+	ReleaseID      uuid.UUID `json:"releaseID"`
+	FieldMatchedOn string    `json:"fieldMatchedOn"`
 }
 
 func CreateTrieRoot() *TrieNode {
@@ -49,7 +49,7 @@ func (t *TrieNode) AddToTrie(prefix string, searchResult SearchResult) {
 
 }
 
-func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID bson.ObjectId) bool {
+func (t *TrieNode) nodeContainsRelease(node *TrieNode, releaseID uuid.UUID) bool {
 	for _, val := range node.SearchResults {
 		if val.ReleaseID == releaseID {
 			return true
@@ -65,7 +65,7 @@ func (t *TrieNode) SearchReleases(prefix string, maxResults int) []SearchResult 
 	if err != nil {
 		return []SearchResult{}
 	}
-	return t.findResultsFromPrefix(startNode, maxResults, []SearchResult{}, make(map[bson.ObjectId]bool))
+	return t.findResultsFromPrefix(startNode, maxResults, []SearchResult{}, make(map[uuid.UUID]bool))
 }
 
 func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
@@ -83,7 +83,7 @@ func (t *TrieNode) searchPrefixForNode(prefix string) (*TrieNode, error) {
 	return curr, nil
 }
 
-func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []SearchResult, idsInResults map[bson.ObjectId]bool) []SearchResult {
+func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results []SearchResult, idsInResults map[uuid.UUID]bool) []SearchResult {
 	for _, searchResult := range node.SearchResults {
 
 		_, ok := idsInResults[searchResult.ReleaseID]
@@ -108,7 +108,7 @@ func (t *TrieNode) findResultsFromPrefix(node *TrieNode, maxResults int, results
 	return results
 }
 
-func (t *TrieNode) RemoveKeyAndReleaseID(key string, value bson.ObjectId) error {
+func (t *TrieNode) RemoveKeyAndReleaseID(key string, value uuid.UUID) error {
 	t.mx.Lock()
 	defer t.mx.Unlock()
 	node, err := t.searchPrefixForNode(key)
