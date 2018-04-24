@@ -5,7 +5,6 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
 
-	"github.com/google/uuid"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -13,7 +12,7 @@ import (
 // with a combination of fields from KEXP's own records, MetaData from MusicBrainz
 // and custom fields related to the 'shelves' application
 type Release struct {
-	ID                      uuid.UUID     `json:"id" bson:"_id"`
+	ID                      string        `json:"id" bson:"_id"`
 	ArtistCredit            []interface{} `json:"artistCredit" bson:"artist-credit"`
 	ReleaseEvents           []interface{} `json:"releaseEvents" bson:"release-events"`
 	CoverArtArchive         interface{}   `json:"coverArtArchive" bson:"cover-art-archive"`

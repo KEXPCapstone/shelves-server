@@ -1,9 +1,8 @@
 package releases
 
 import (
+	"log"
 	"strings"
-
-	"github.com/google/uuid"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
 	mgo "gopkg.in/mgo.v2"
@@ -45,7 +44,7 @@ func (ms *MongoStore) AddRelease(release *Release) (*Release, error) {
 
 // GetReleases returns releases in the library greater than 'lastID'
 // 'limit' specifies the max # of releases to return
-func (ms *MongoStore) GetReleases(lastID uuid.UUID, limit int) ([]*Release, error) {
+func (ms *MongoStore) GetReleases(lastID string, limit int) ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
 	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&releases); err != nil {
@@ -55,10 +54,12 @@ func (ms *MongoStore) GetReleases(lastID uuid.UUID, limit int) ([]*Release, erro
 }
 
 // GetReleaseByID returns a single release in the library
-func (ms *MongoStore) GetReleaseByID(id uuid.UUID) (*Release, error) {
+func (ms *MongoStore) GetReleaseByID(id string) (*Release, error) {
+	log.Printf("UUID: '%v'", id)
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
+		log.Print(err)
 		return nil, err
 	}
 	return release, nil
@@ -117,7 +118,7 @@ func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 }
 
 // GetArtistByMBID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
-func (ms *MongoStore) GetArtistByMBID(id uuid.UUID) (*Artist, error) {
+func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artist := &Artist{}
 	if err := coll.FindId(id).One(artist); err != nil {

@@ -7,7 +7,7 @@ import (
 // Artist represents an artist in the KEXP library, with additional
 // information about associated releases
 type Artist struct {
-	ArtistMBID uuid.UUID        `json:"artistMBID" bson:"_id"`
+	ArtistMBID string           `json:"artistMBID" bson:"_id"`
 	Name       string           `json:"name" bson:"name"`
 	Releases   []ReleaseSummary `json:"releases" bson:"releases"`
 }
