@@ -3,7 +3,9 @@
 version: '3'
 services:
   gateway:
-    build: gateway/
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
     image: kexpcapstone/gatewaysvc
     environment:
       - SHELVESSVCADDR=shelves:80
@@ -44,7 +46,9 @@ services:
     networks:
       - dylan
   library:
-    build: library/
+    build:
+      context: .
+      dockerfile: library/Dockerfile
     image: kexpcapstone/librarysvc
     container_name: library
     environment:
@@ -56,7 +60,9 @@ services:
     networks:
       - dylan
   shelves:
-    build: shelves/
+    build:
+      context: .
+      dockerfile: shelves/Dockerfile
     image: kexpcapstone/shelvessvc
     container_name: shelves
     environment:
