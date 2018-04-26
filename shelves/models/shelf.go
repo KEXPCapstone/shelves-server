@@ -39,7 +39,7 @@ func (ns *NewShelf) ToShelf(userID bson.ObjectId) (*Shelf, error) {
 		ID:           bson.NewObjectId(),
 		OwnerID:      userID,
 		Name:         ns.Name,
-		ReleaseIDs:   []bson.ObjectId{},
+		ReleaseIDs:   []string{},
 		Description:  ns.Description,
 		DateCreated:  time.Now(),
 		DateLastEdit: time.Now(),
