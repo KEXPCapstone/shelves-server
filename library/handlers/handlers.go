@@ -136,12 +136,22 @@ func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 
 // /v1/library/notes/releases/{id}
 func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
-	// decode into new note struct
-	// convert to note
-	// get the release by it's id
-	// put the note into the notes collection
-	// update the release's notes slice to include the id of the new note
-	// return
+	switch r.Method {
+	case http.MethodPost:
+		hCtx.insertNote(w, r)
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+
+}
+
+func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
+	releaseID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(releaseID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid release id", releaseID), http.StatusBadRequest)
+		return
+	}
 	nn := &releases.NewNote{}
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
@@ -154,11 +164,13 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	note, err := nn.ToNote(userID)
 	if err != nil {
-
+		http.Error(w, err, http.StatusBadRequest)
+		return
 	}
-	insertedNote, err := hCtx.libraryStore.AddNoteToRelease(bson.NewObjectId(), note)
+	insertedNote, err := hCtx.libraryStore.AddNoteToRelease(releaseID, note)
 	if err != nil {
-
+		http.Error(w, err, http.StatusInternalServerError)
+		return
 	}
 	respond(w, http.StatusCreated, insertedNote)
 }
