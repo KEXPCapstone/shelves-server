@@ -143,7 +143,24 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	// update the release's notes slice to include the id of the new note
 	// return
 	nn := &releases.NewNote{}
+	userID, err := getUserIDFromRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(nn); err != nil {
+		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
+		return
+	}
+	note, err := nn.ToNote(userID)
+	if err != nil {
 
+	}
+	insertedNote, err := hCtx.libraryStore.AddNoteToRelease(bson.NewObjectId(), note)
+	if err != nil {
+
+	}
+	respond(w, http.StatusCreated, insertedNote)
 }
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
