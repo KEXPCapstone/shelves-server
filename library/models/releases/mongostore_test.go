@@ -64,7 +64,7 @@ func TestNewMongoStoreNilSession(t *testing.T) {
 		}
 	}()
 	// this call should cause panic() to be caught by the defer above
-	_ = NewMongoStore(nil, "foo", "bar", "baz", "bip")
+	_ = NewMongoStore(nil, "foo", "bar", "baz", "bip", "woop")
 }
 
 func TestAddRelease(t *testing.T) {
