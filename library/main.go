@@ -40,12 +40,16 @@ func main() {
 	if len(genreColl) == 0 {
 		log.Fatal("Please provide GENRECOLL")
 	}
+	noteColl := os.Getenv("NOTECOLL")
+	if len(noteColl) == 0 {
+		log.Fatal("Please provide GENRECOLL")
+	}
 	mongoSess, err := mgo.Dial(dbAddr)
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl)
+	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl, noteColl)
 
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
