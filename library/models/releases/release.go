@@ -41,12 +41,16 @@ type ReleaseAndMatchCriteria struct {
 	IndexInfo indexes.SearchResult `json:"indexInfo"`
 }
 
+type NewNote struct {
+	Comment     string    `json:"comment"`
+	DateCreated time.Time `json:"dateCreated"`
+}
+
 // Note represents a note/comment for a given release
 type Note struct {
 	ID          bson.ObjectId `json:"id" bson:"_id"`
 	Author      string        `json:"author"`
 	Comment     string        `json:"comment"`
-	UserID      bson.ObjectId `json:"userID"`
 	DateCreated time.Time     `json:"dateCreated"`
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
