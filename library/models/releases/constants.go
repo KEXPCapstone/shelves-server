@@ -7,3 +7,5 @@ var ErrReleaseNotFound = "Could not find a release for the given ID"
 var ErrCategoryNotFound = "Could not find releases under specified category"
 
 const ErrInsertNote = "Error inserting note: "
+
+const ErrAddNoteToRelease = "Error adding note to release: "

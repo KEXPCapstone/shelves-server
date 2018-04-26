@@ -158,12 +158,12 @@ func (ms *MongoStore) AddNoteToRelease(releaseID string, note *Note) (*Note, err
 	}
 	release, err := ms.GetReleaseByID(releaseID)
 	if err != nil {
-
+		return nil, ErrReleaseNotFound
 	}
-
+	release.Notes = append(release.Notes, note.ID)
 	releaseColl := ms.session.DB(ms.dbname).C(ms.releaseCollection)
-	if err := releaseColl.UpdateId(releaseID, bson.M{}); err != nil {
-
+	if err := releaseColl.UpdateId(releaseID, bson.M{"$set": release}); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrAddNoteToRelease, err)
 	}
 	return note, nil
 }
