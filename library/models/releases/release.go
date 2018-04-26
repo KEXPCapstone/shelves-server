@@ -1,6 +1,7 @@
 package releases
 
 import (
+	"errors"
 	"time"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
@@ -53,4 +54,24 @@ type Note struct {
 	Comment     string        `json:"comment"`
 	DateCreated time.Time     `json:"dateCreated"`
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
+}
+
+func (nn *NewNote) Validate() error {
+	if len(nn.Comment) == 0 {
+		return errors.New(ErrEmptyComment)
+	}
+	return nil
+}
+
+func (nn *NewNote) ToNote(userID bson.ObjectId) (*Note, error) {
+	if err := nn.Validate(); err != nil {
+		return nil, err
+	}
+	note := &Note{
+		ID:          bson.NewObjectId(),
+		Author:      userID,
+		Comment:     nn.Comment,
+		DateCreated: nn.DateCreated,
+	}
+	return note, nil
 }
