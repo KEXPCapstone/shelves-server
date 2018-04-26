@@ -50,7 +50,7 @@ type NewNote struct {
 // Note represents a note/comment for a given release
 type Note struct {
 	ID          bson.ObjectId `json:"id" bson:"_id"`
-	Author      string        `json:"author"`
+	OwnerID     bson.ObjectId `json:"author"`
 	Comment     string        `json:"comment"`
 	DateCreated time.Time     `json:"dateCreated"`
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
@@ -69,7 +69,7 @@ func (nn *NewNote) ToNote(userID bson.ObjectId) (*Note, error) {
 	}
 	note := &Note{
 		ID:          bson.NewObjectId(),
-		Author:      userID,
+		OwnerID:     userID,
 		Comment:     nn.Comment,
 		DateCreated: nn.DateCreated,
 	}

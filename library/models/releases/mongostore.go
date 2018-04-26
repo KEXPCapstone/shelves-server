@@ -1,6 +1,7 @@
 package releases
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -158,7 +159,7 @@ func (ms *MongoStore) AddNoteToRelease(releaseID string, note *Note) (*Note, err
 	}
 	release, err := ms.GetReleaseByID(releaseID)
 	if err != nil {
-		return nil, ErrReleaseNotFound
+		return nil, errors.New(ErrReleaseNotFound)
 	}
 	release.Notes = append(release.Notes, note.ID)
 	releaseColl := ms.session.DB(ms.dbname).C(ms.releaseCollection)
