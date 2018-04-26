@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -82,11 +83,36 @@ func main() {
 	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 
-	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
+	mux.Handle("/v1/library/", UnAuthMicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 
 	corsHandler := handlers.NewCorsHandler(mux)
+	log.Println("Starting to redirect http traffic to https")
+	go func() {
+		if err := http.ListenAndServe(":80", http.HandlerFunc(redirectTLS)); err != nil {
+			log.Fatalf("HTTP ListenAndServe error: %v", err)
+		}
+	}()
+
 	fmt.Printf("'Gateway' server has been started at http://%s\n", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, tlsCert, tlsKey, corsHandler)) // report if any errors occur
+}
+
+func redirectTLS(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+}
+
+func UnAuthMicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
+	index := 0
+	mx := sync.Mutex{}
+	return &httputil.ReverseProxy{
+		Director: func(r *http.Request) {
+			mx.Lock()
+			r.URL.Host = addrs[index%len(addrs)]
+			index++
+			mx.Unlock()
+			r.URL.Scheme = "http" //downgrade to http protocol
+		},
+	}
 }
 
 func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
@@ -94,17 +120,17 @@ func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Sto
 	mx := sync.Mutex{}
 	return &httputil.ReverseProxy{
 		Director: func(r *http.Request) {
-			// sessionState := &handlers.SessionState{}
-			// _, err := sessions.GetState(r, signingKey, sessStore, sessionState)
-			// if err == nil { // Add X-User header if signed in.
-			// 	userJSON, jsonErr := json.Marshal(sessionState.AuthUsr)
-			// 	if jsonErr != nil { // we know the user will be a json structured object, this error is unlikely to occur
-			// 		log.Printf("error marshalling user: %v", sessionState.AuthUsr)
-			// 	}
-			// 	r.Header.Add("X-User", string(userJSON))
-			// } else {
-			// 	r.Header.Del("X-User") // remove Header in case hostile client tried to pass X-User
-			// }
+			sessionState := &handlers.SessionState{}
+			_, err := sessions.GetState(r, signingKey, sessStore, sessionState)
+			if err == nil { // Add X-User header if signed in.
+				userJSON, jsonErr := json.Marshal(sessionState.AuthUsr)
+				if jsonErr != nil { // we know the user will be a json structured object, this error is unlikely to occur
+					log.Printf("error marshalling user: %v", sessionState.AuthUsr)
+				}
+				r.Header.Add("X-User", string(userJSON))
+			} else {
+				r.Header.Del("X-User") // remove Header in case hostile client tried to pass X-User
+			}
 			mx.Lock()
 			r.URL.Host = addrs[index%len(addrs)]
 			index++

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // a helper function which will create a new MongoDB database
@@ -67,7 +66,7 @@ func TestAddRelease(t *testing.T) {
 	if err != nil {
 		t.Errorf("[MetaTest] Error creating test MongoStore: '%v", err)
 	}
-	newRelease, err := createDefaultTestRelease(bson.NewObjectId())
+	newRelease, err := createDefaultTestRelease()
 	if err != nil {
 		t.Errorf("[MetaTest] %v", err)
 	}
@@ -81,14 +80,11 @@ func TestAddRelease(t *testing.T) {
 
 // helper function creates a new release struct populated with placeholder
 // fields to be reset to whatever is needed
-func createDefaultTestRelease(id bson.ObjectId) (*Release, error) {
+func createDefaultTestRelease() (*Release, error) {
 	// unmarshal an example doc into release struct
-	newRelease := &Release{
-		ID: id,
-	}
-	// make this a constant
-	rawJSON := `{"KEXPReleaseGroupMBID" : "62917949-8997-409b-94fb-af8a41ff3c52", "KEXPPrimaryGenre" : "Rock/Pop", "KEXPCountryCode" : "US", "KEXPDateReleased" : "2015-09-25", "KEXPMBID" : "cd7d006c-a9fa-4094-a733-6d001dcfa4b4", "KEXPReleaseArtistCredit" : "Kurt Vile", "KEXPArtist_KEXPSortName" : "Vile, Kurt", "KEXPFirstReleaseDate" : "2015-09-25", "KEXPTitle" : "b'lieve i'm goin down..."}`
-	buffer := []byte(rawJSON)
+	mockReleaseJSON := `{"id":"53042259-1287-4f47-9a99-5a7413df7b3f","artistCredit":[{"artist":{"disambiguation":"∆","id":"fc7bbf00-fbaa-4736-986b-b3ac0266ca9b","name":"alt-J","sort-name":"alt-J"},"joinphrase":"","name":"alt-J"}],"releaseEvents":[{"area":{"disambiguation":"","id":"106e0bec-b638-3b37-b731-f53d507dc00e","iso-3166-1-codes":["AU"],"name":"Australia","sort-name":"Australia"},"date":"2012"}],"coverArtArchive":{"artwork":true,"back":false,"count":1,"darkened":false,"front":true},"KEXPReleaseGroupMBID":"0d8562eb-7f72-427b-8a0b-984cc5ee7766","KEXPReleaseArtistCredit":"alt-J","labelInfo":[{"catalog-number":"LIB140CD","label":{"disambiguation":"","id":"8c63a604-872c-488e-af18-5cead3d82f17","label-code":null,"name":"Liberator Music","sort-name":"Liberator Music"}}],"media":[],"Status":"Official","Disambiguation":"","barcode":"9341004016156","packaging":"Jewel Case","date":"2012","asin":"","KEXPPrimaryGenre":"Rock/Pop","title":"An Awesome Wave","countryCode":"AU","yellows":null,"reds":null}`
+	newRelease := &Release{}
+	buffer := []byte(mockReleaseJSON)
 	if err := json.Unmarshal(buffer, newRelease); err != nil {
 		return nil, fmt.Errorf("[MetaTest] Error unmarshalling JSON: '%v'", err)
 	}
@@ -104,24 +100,22 @@ func TestGetReleaseByID(t *testing.T) {
 	if err != nil {
 		t.Errorf("[MetaTest] Error creating test MongoStore: '%v", err)
 	}
-	// insert a new doc
-	targetID := bson.NewObjectId()
-	newRelease, err := createDefaultTestRelease(targetID)
+	newRelease, err := createDefaultTestRelease()
 	if err != nil {
 		t.Errorf("[MetaTest] %v", err)
 	}
 
 	libraryStore.AddRelease(newRelease)
 	// non-existent doc, valid bson ID
-	if release, err := libraryStore.GetReleaseByID(bson.NewObjectId()); err == nil {
+	if release, err := libraryStore.GetReleaseByID("not a real ID"); err == nil {
 		t.Errorf("Expected error, did not receive one: '%v'", release)
 	}
 	// doc exists
-	release, err := libraryStore.GetReleaseByID(targetID)
+	release, err := libraryStore.GetReleaseByID("53042259-1287-4f47-9a99-5a7413df7b3f")
 	if err != nil {
-		t.Errorf("Error getting doc by id: %v", err)
+		t.Errorf("Error getting doc from id '%v': '%v'", newRelease.ID, err)
 	}
-	if release.KEXPMBID != newRelease.KEXPMBID {
-		t.Errorf("MBID fields do not match. Expected: '%v', Actual: '%v'", newRelease.KEXPMBID, release.KEXPMBID)
+	if release.ID != newRelease.ID {
+		t.Errorf("MBID fields do not match. Expected: '%v', Actual: '%v'", newRelease.ID, release.ID)
 	}
 }

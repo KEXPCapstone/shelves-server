@@ -14,10 +14,10 @@ type LibraryStore interface {
 	AddRelease(release *Release) (*Release, error)
 
 	// return all releases in the library
-	GetReleases(lastID bson.ObjectId, limit int) ([]*Release, error)
+	GetReleases(lastID string, limit int) ([]*Release, error)
 
 	// return a single release with the supplied id
-	GetReleaseByID(id bson.ObjectId) (*Release, error)
+	GetReleaseByID(id string) (*Release, error)
 
 	// return a slice of releases matching the given field value
 	GetReleasesByField(field string, value string) ([]*Release, error)

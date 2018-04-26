@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -63,14 +63,18 @@ func (ms *MgoStore) GetShelfById(id bson.ObjectId) (*Shelf, error) {
 func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	shelves := []*Shelf{}
-	if err := coll.Find(bson.M{"OwnerID": userId}).All(&shelves); err != nil {
+	if err := coll.Find(bson.M{"ownerid": userId}).All(&shelves); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
 	}
 	return shelves, nil
 }
 
 // TODO: Evaluate best means of updating; replacing or patching
-func (ms *MgoStore) UpdateShelf(id bson.ObjectId) error {
+func (ms *MgoStore) UpdateShelf(id bson.ObjectId, replacementShelf *Shelf) error {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	if err := coll.UpdateId(id, replacementShelf); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -94,4 +98,17 @@ func (ms *MgoStore) CopyShelf(id bson.ObjectId, userId bson.ObjectId) (*Shelf, e
 		return nil, err
 	}
 	return copied, nil
+}
+
+func (ms *MgoStore) ExportShelf(id bson.ObjectId) error {
+	return nil
+}
+
+func (ms *MgoStore) GetFeaturedShelves() ([]*Shelf, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.colname)
+	shelves := []*Shelf{}
+	if err := coll.Find(bson.M{"featured": true}).All(&shelves); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrShelfNotFound, err)
+	}
+	return shelves, nil
 }
