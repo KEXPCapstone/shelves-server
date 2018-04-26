@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -105,17 +106,17 @@ func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Sto
 	mx := sync.Mutex{}
 	return &httputil.ReverseProxy{
 		Director: func(r *http.Request) {
-			// sessionState := &handlers.SessionState{}
-			// _, err := sessions.GetState(r, signingKey, sessStore, sessionState)
-			// if err == nil { // Add X-User header if signed in.
-			// 	userJSON, jsonErr := json.Marshal(sessionState.AuthUsr)
-			// 	if jsonErr != nil { // we know the user will be a json structured object, this error is unlikely to occur
-			// 		log.Printf("error marshalling user: %v", sessionState.AuthUsr)
-			// 	}
-			// 	r.Header.Add("X-User", string(userJSON))
-			// } else {
-			// 	r.Header.Del("X-User") // remove Header in case hostile client tried to pass X-User
-			// }
+			sessionState := &handlers.SessionState{}
+			_, err := sessions.GetState(r, signingKey, sessStore, sessionState)
+			if err == nil { // Add X-User header if signed in.
+				userJSON, jsonErr := json.Marshal(sessionState.AuthUsr)
+				if jsonErr != nil { // we know the user will be a json structured object, this error is unlikely to occur
+					log.Printf("error marshalling user: %v", sessionState.AuthUsr)
+				}
+				r.Header.Add("X-User", string(userJSON))
+			} else {
+				r.Header.Del("X-User") // remove Header in case hostile client tried to pass X-User
+			}
 			mx.Lock()
 			r.URL.Host = addrs[index%len(addrs)]
 			index++

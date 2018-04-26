@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/shelves/models"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -131,11 +132,15 @@ func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, err
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	xUserHeader := r.Header.Get(XUser)
-	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
+	usr := &users.User{}
+	// if err := json.NewDecoder(xUserHeader).Decode(usr); err != nil {
+	// 	return bson.NewObjectId(), fmt.Errorf("Error decoding request body: %v", err)
+	// }
+	json.Unmarshal([]byte(xUserHeader), usr)
+	if len(usr.ID) == 0 {
 		return bson.NewObjectId(), ErrInvalidXUser
 	}
-	userID := bson.ObjectIdHex(xUserHeader)
-	return userID, nil
+	return usr.ID, nil
 }
 
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
