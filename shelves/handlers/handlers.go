@@ -85,6 +85,22 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// v1/shelves/featured
+func (hCtx *HandlerCtx) FeaturedShelvesHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		shelves, err := hCtx.shelfStore.GetFeaturedShelves()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, shelves)
+	default:
+		http.Error(w, FeaturedShelvesHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 /***
 	HELPER METHODS
 ***/

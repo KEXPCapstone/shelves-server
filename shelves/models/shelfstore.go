@@ -33,4 +33,6 @@ type ShelfStore interface {
 	// TODO: export provided shelf as a folder to Dalet
 	// This should probably be a handler function and not a store function
 	ExportShelf(id bson.ObjectId) error
+
+	GetFeaturedShelves() ([]*Shelf, error)
 }
