@@ -29,7 +29,8 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		if _, err := uuid.Parse(lastID); err != nil {
-			http.Error(w, fmt.Sprintf("Invalid value for 'last_id': %v", lastID), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Invalid value for 'last_id': '%v' (should be MBID)", lastID), http.StatusBadRequest)
+			return
 		}
 		releases, err := hCtx.libraryStore.GetReleases(lastID, intLimit)
 		if err != nil {
