@@ -14,7 +14,6 @@ import (
 // :param: last_id, id of the last release the client saw, for pagination
 // :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
-
 	switch r.Method {
 	case http.MethodPost:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
@@ -128,6 +127,11 @@ func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 // GenresHandler path: /v1/library/genres
 func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 	return
+}
+
+// /v1/library/notes/releases/{id}
+func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
