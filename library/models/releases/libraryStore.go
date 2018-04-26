@@ -37,4 +37,6 @@ type LibraryStore interface {
 	GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error)
 
 	IndexReleases() (*indexes.TrieNode, error)
+
+	AddNoteToRelease(releaseID string, note *Note) (*Note, error)
 }
