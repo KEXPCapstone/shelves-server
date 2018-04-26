@@ -58,6 +58,8 @@ services:
     container_name: shelves
     environment:
       - DBADDR=mongodb:27017
+      - SHELVESDB=shelves
+      - SHELVESCOLL=shelves
     networks:
       - dylan
 networks:
