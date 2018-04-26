@@ -43,6 +43,7 @@ type ReleaseAndMatchCriteria struct {
 
 // Note represents a note/comment for a given release
 type Note struct {
+	ID          bson.ObjectId `json:"id" bson:"_id"`
 	Author      string        `json:"author"`
 	Comment     string        `json:"comment"`
 	UserID      bson.ObjectId `json:"userID"`
