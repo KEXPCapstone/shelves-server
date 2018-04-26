@@ -131,7 +131,10 @@ func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 
 // /v1/library/notes/releases/{id}
 func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
-
+	// get the release by it's id
+	// put the note into the notes collection
+	// update the release's notes slice to include the id of the new note
+	// return
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
