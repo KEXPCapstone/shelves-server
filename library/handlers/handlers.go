@@ -1,13 +1,18 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
 	"strconv"
 	"strings"
 
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"github.com/google/uuid"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // ReleasesHandler path: /v1/library/releases
@@ -137,6 +142,20 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	// put the note into the notes collection
 	// update the release's notes slice to include the id of the new note
 	// return
+	nn := &releases.NewNote{}
+
+}
+
+func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
+	xUserHeader := r.Header.Get(XUser)
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return bson.NewObjectId(), fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	if len(usr.ID) == 0 {
+		return bson.NewObjectId(), errors.New(ErrInvalidXUser)
+	}
+	return usr.ID, nil
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {

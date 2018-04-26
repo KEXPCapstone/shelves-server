@@ -19,3 +19,5 @@ const contentTypeJSON = "application/json"
 const maxSearchResults = 100
 
 const ErrorSearching = "Error processing release results: "
+
+const ErrInvalidXUser = "Invalid ID in X-User header. You may have been signed out."
