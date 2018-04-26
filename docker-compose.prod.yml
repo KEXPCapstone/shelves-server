@@ -51,6 +51,7 @@ services:
       - RELEASECOLL=releases
       - ARTISTCOLL=artists
       - GENRECOLL=genres
+      - NOTECOLL=notes
     networks:
       - dylan
   shelves:
