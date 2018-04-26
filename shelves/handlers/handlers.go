@@ -109,7 +109,7 @@ func (hCtx *HandlerCtx) FeaturedShelvesHandler(w http.ResponseWriter, r *http.Re
 func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) bool {
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
-		return false // improve this return, change to err? you want to capture the fact that the user is not authenticated
+		return false
 	}
 	if userID != shelf.OwnerID {
 		return false
@@ -133,10 +133,9 @@ func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, err
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	xUserHeader := r.Header.Get(XUser)
 	usr := &users.User{}
-	// if err := json.NewDecoder(xUserHeader).Decode(usr); err != nil {
-	// 	return bson.NewObjectId(), fmt.Errorf("Error decoding request body: %v", err)
-	// }
-	json.Unmarshal([]byte(xUserHeader), usr)
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return bson.NewObjectId(), fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
 	if len(usr.ID) == 0 {
 		return bson.NewObjectId(), ErrInvalidXUser
 	}
