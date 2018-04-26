@@ -7,15 +7,16 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/google/uuid"
 )
 
 // ReleasesHandler path: /v1/library/releases
+// :param: last_id, id of the last release the client saw, for pagination
+// :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		// TODO
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	case http.MethodGet:
@@ -24,13 +25,16 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 
 		intLimit, err := strconv.Atoi(limit)
 		if err != nil {
-			// for now this is a 500
 			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
 			return
 		}
-		releases, err := hCtx.libraryStore.GetReleases(bson.ObjectIdHex(lastID), intLimit)
+		if _, err := uuid.Parse(lastID); err != nil {
+			http.Error(w, fmt.Sprintf("Invalid value for 'last_id': '%v' (should be MBID)", lastID), http.StatusBadRequest)
+			return
+		}
+		releases, err := hCtx.libraryStore.GetReleases(lastID, intLimit)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not get releases: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Could not fetch releases: %v", err), http.StatusInternalServerError)
 			return
 		}
 		respond(w, http.StatusOK, releases)
@@ -76,16 +80,14 @@ func (hCtx *HandlerCtx) RelatedReleasesHandler(w http.ResponseWriter, r *http.Re
 // SingleReleaseHandler path: /v1/library/releases/
 func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
-	if !bson.IsObjectIdHex(releaseID) {
-		http.Error(w, ErrInvalidReleaseID, http.StatusBadRequest)
-		return
+	if _, err := uuid.Parse(releaseID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid release id", releaseID), http.StatusBadRequest)
 	}
-	releaseIDBson := bson.ObjectIdHex(releaseID)
 	switch r.Method {
 	case http.MethodGet:
-		release, err := hCtx.libraryStore.GetReleaseByID(releaseIDBson)
+		release, err := hCtx.libraryStore.GetReleaseByID(releaseID)
 		if err != nil {
-			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
 			return
 		}
 		respond(w, http.StatusOK, release)

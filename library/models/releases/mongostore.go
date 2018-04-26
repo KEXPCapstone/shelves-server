@@ -1,6 +1,7 @@
 package releases
 
 import (
+	"log"
 	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
@@ -43,7 +44,7 @@ func (ms *MongoStore) AddRelease(release *Release) (*Release, error) {
 
 // GetReleases returns releases in the library greater than 'lastID'
 // 'limit' specifies the max # of releases to return
-func (ms *MongoStore) GetReleases(lastID bson.ObjectId, limit int) ([]*Release, error) {
+func (ms *MongoStore) GetReleases(lastID string, limit int) ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
 	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&releases); err != nil {
@@ -53,10 +54,12 @@ func (ms *MongoStore) GetReleases(lastID bson.ObjectId, limit int) ([]*Release, 
 }
 
 // GetReleaseByID returns a single release in the library
-func (ms *MongoStore) GetReleaseByID(id bson.ObjectId) (*Release, error) {
+func (ms *MongoStore) GetReleaseByID(id string) (*Release, error) {
+	log.Printf("UUID: '%v'", id)
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	release := &Release{}
 	if err := coll.FindId(id).One(release); err != nil {
+		log.Print(err)
 		return nil, err
 	}
 	return release, nil
@@ -93,9 +96,8 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
-		t.AddToTrie(strings.ToLower(release.KEXPDateReleased), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPDateReleased"})
-		t.AddToTrie(strings.ToLower(release.KEXPTitle), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPTitle"})
-
+		t.AddToTrie(strings.ToLower(release.Date), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Date"})
+		t.AddToTrie(strings.ToLower(release.Title), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Title"})
 	}
 
 	if err := iter.Close(); err != nil {
