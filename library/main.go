@@ -64,6 +64,7 @@ func main() {
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
 	mux.HandleFunc("/v1/library/artists", hCtx.ArtistsHandler)
 	mux.HandleFunc("/v1/library/genres", hCtx.GenresHandler)
+	mux.HandleFunc("/v1/library/notes/releases/", hCtx.NotesHandler)
 
 	log.Printf("The 'library' microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))
