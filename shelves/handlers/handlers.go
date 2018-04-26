@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/shelves/models"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -85,6 +86,22 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// v1/shelves/featured
+func (hCtx *HandlerCtx) FeaturedShelvesHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		shelves, err := hCtx.shelfStore.GetFeaturedShelves()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, shelves)
+	default:
+		http.Error(w, FeaturedShelvesHandlerMethodNotAllowed, http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 /***
 	HELPER METHODS
 ***/
@@ -92,7 +109,7 @@ func (hCtx *HandlerCtx) ShelfHandler(w http.ResponseWriter, r *http.Request) {
 func currUserIsShelfOwner(r *http.Request, shelf *models.Shelf) bool {
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
-		return false // improve this return, change to err? you want to capture the fact that the user is not authenticated
+		return false
 	}
 	if userID != shelf.OwnerID {
 		return false
@@ -115,11 +132,14 @@ func (hCtx *HandlerCtx) getShelfFromRequest(r *http.Request) (*models.Shelf, err
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	xUserHeader := r.Header.Get(XUser)
-	if len(xUserHeader) == 0 || !bson.IsObjectIdHex(xUserHeader) {
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return bson.NewObjectId(), fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	if len(usr.ID) == 0 {
 		return bson.NewObjectId(), ErrInvalidXUser
 	}
-	userID := bson.ObjectIdHex(xUserHeader)
-	return userID, nil
+	return usr.ID, nil
 }
 
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
