@@ -164,12 +164,12 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	}
 	note, err := nn.ToNote(userID)
 	if err != nil {
-		http.Error(w, err, http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
 	insertedNote, err := hCtx.libraryStore.AddNoteToRelease(releaseID, note)
 	if err != nil {
-		http.Error(w, err, http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
 		return
 	}
 	respond(w, http.StatusCreated, insertedNote)
