@@ -152,18 +152,18 @@ func (ms *MongoStore) GetGenreByID(id bson.ObjectId) (*Genre, error) {
 	return genre, nil
 }
 
-func (ms *MongoStore) AddNoteToRelease(releaseID string, note *Note) (*Note, error) {
+func (ms *MongoStore) AddNoteToRelease(note *Note) (*Note, error) {
 	noteColl := ms.session.DB(ms.dbname).C(ms.noteCollection)
 	if err := noteColl.Insert(note); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrInsertNote, err)
 	}
-	release, err := ms.GetReleaseByID(releaseID)
+	release, err := ms.GetReleaseByID(note.ReleaseID)
 	if err != nil {
 		return nil, errors.New(ErrReleaseNotFound)
 	}
 	release.Notes = append(release.Notes, note.ID)
 	releaseColl := ms.session.DB(ms.dbname).C(ms.releaseCollection)
-	if err := releaseColl.UpdateId(releaseID, bson.M{"$set": release}); err != nil {
+	if err := releaseColl.UpdateId(note.ReleaseID, bson.M{"$set": release}); err != nil {
 		return nil, fmt.Errorf("%v %v", ErrAddNoteToRelease, err)
 	}
 	return note, nil
