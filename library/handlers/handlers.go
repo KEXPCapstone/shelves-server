@@ -162,7 +162,7 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
 	}
-	note, err := nn.ToNote(userID)
+	note, err := nn.ToNote(userID, releaseID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
