@@ -51,6 +51,7 @@ services:
       - RELEASECOLL=releases
       - ARTISTCOLL=artists
       - GENRECOLL=genres
+      - NOTECOLL=notes
     networks:
       - dylan
   shelves:
@@ -58,6 +59,8 @@ services:
     container_name: shelves
     environment:
       - DBADDR=mongodb:27017
+      - SHELVESDB=shelves
+      - SHELVESCOLL=shelves
     networks:
       - dylan
 networks:

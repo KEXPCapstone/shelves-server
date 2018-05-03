@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	mgo "gopkg.in/mgo.v2"
+	mgo "github.com/globalsign/mgo"
 )
 
 // a helper function which will create a new MongoDB database
@@ -19,7 +19,8 @@ func createTestingMgoStore() (*MongoStore, error) {
 	releaseCol := "releases"
 	artistCol := "artists"
 	genreCol := "genres"
-	ms := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol)
+	noteCol := "notes"
+	ms := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol, noteCol)
 	return ms, nil
 }
 
@@ -28,11 +29,13 @@ func TestNewMongoStore(t *testing.T) {
 	releaseCol := "releases"
 	artistCol := "artists"
 	genreCol := "genres"
+	noteCol := "notes"
+
 	mongoSess, err := mgo.Dial("localhost")
 	if err != nil {
 		t.Errorf("Error dialing mongodb: %v", err)
 	}
-	libraryStore := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol)
+	libraryStore := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol, noteCol)
 	if libraryStore.session != mongoSess {
 		t.Errorf("Error setting session. Expected: '%v', Actual: '%v'", mongoSess, libraryStore.session)
 	}
@@ -48,6 +51,9 @@ func TestNewMongoStore(t *testing.T) {
 	if libraryStore.genreCollection != genreCol {
 		t.Errorf("Error setting genre collection name. Expected: '%v' Actual: '%v'", genreCol, libraryStore.genreCollection)
 	}
+	if libraryStore.noteCollection != noteCol {
+		t.Errorf("Error setting note collection name. Expected: '%v' Actual: '%v'", noteCol, libraryStore.noteCollection)
+	}
 }
 
 func TestNewMongoStoreNilSession(t *testing.T) {
@@ -58,7 +64,7 @@ func TestNewMongoStoreNilSession(t *testing.T) {
 		}
 	}()
 	// this call should cause panic() to be caught by the defer above
-	_ = NewMongoStore(nil, "foo", "bar", "baz", "bip")
+	_ = NewMongoStore(nil, "foo", "bar", "baz", "bip", "woop")
 }
 
 func TestAddRelease(t *testing.T) {

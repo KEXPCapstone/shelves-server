@@ -8,7 +8,7 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/shelves/models"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 // /v1/shelves/mine/

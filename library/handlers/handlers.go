@@ -1,12 +1,17 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
 	"strconv"
 	"strings"
 
+	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
+	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"
 )
 
@@ -14,7 +19,6 @@ import (
 // :param: last_id, id of the last release the client saw, for pagination
 // :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
-
 	switch r.Method {
 	case http.MethodPost:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
@@ -128,6 +132,59 @@ func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 // GenresHandler path: /v1/library/genres
 func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 	return
+}
+
+// /v1/library/notes/releases/{id}
+func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		hCtx.insertNote(w, r)
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+
+}
+
+func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
+	releaseID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(releaseID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid release id", releaseID), http.StatusBadRequest)
+		return
+	}
+	nn := &releases.NewNote{}
+	userID, err := getUserIDFromRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(nn); err != nil {
+		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
+		return
+	}
+	note, err := nn.ToNote(userID, releaseID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+	insertedNote, err := hCtx.libraryStore.AddNoteToRelease(note)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+		return
+	}
+	respond(w, http.StatusCreated, insertedNote)
+}
+
+func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
+	xUserHeader := r.Header.Get(XUser)
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return bson.NewObjectId(), fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	if len(usr.ID) == 0 {
+		return bson.NewObjectId(), errors.New(ErrInvalidXUser)
+	}
+	return usr.ID, nil
 }
 
 func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {

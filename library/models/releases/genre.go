@@ -1,7 +1,7 @@
 package releases
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 // Genre represents a genre in the KEXP library, with additional

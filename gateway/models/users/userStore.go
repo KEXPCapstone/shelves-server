@@ -1,6 +1,6 @@
 package users
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/globalsign/mgo/bson"
 
 type UserStore interface {
 	//GetByID returns the User with the given ID

@@ -1,6 +1,6 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/globalsign/mgo/bson"
 
 // TODO: Evaluate correct type of 'id' parameters
 type ShelfStore interface {

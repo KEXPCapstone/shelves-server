@@ -7,7 +7,7 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/library/handlers"
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
-	mgo "gopkg.in/mgo.v2"
+	mgo "github.com/globalsign/mgo"
 )
 
 func main() {
@@ -40,12 +40,16 @@ func main() {
 	if len(genreColl) == 0 {
 		log.Fatal("Please provide GENRECOLL")
 	}
+	noteColl := os.Getenv("NOTECOLL")
+	if len(noteColl) == 0 {
+		log.Fatal("Please provide GENRECOLL")
+	}
 	mongoSess, err := mgo.Dial(dbAddr)
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl)
+	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl, noteColl)
 
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
@@ -60,6 +64,7 @@ func main() {
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
 	mux.HandleFunc("/v1/library/artists", hCtx.ArtistsHandler)
 	mux.HandleFunc("/v1/library/genres", hCtx.GenresHandler)
+	mux.HandleFunc("/v1/library/notes/releases/", hCtx.NotesHandler)
 
 	log.Printf("The 'library' microservice is listening at http://%s...", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))

@@ -4,18 +4,18 @@ import (
 	"errors"
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 type Shelf struct {
-	ID           bson.ObjectId   `json:"id" bson:"_id"`
-	OwnerID      bson.ObjectId   `json:"ownerId"` // TODO: May have to also add bson tag here
-	Name         string          `json:"name"`
-	ReleaseIDs   []bson.ObjectId `json:"releaseIDs"`
-	Description  string          `json:"description"` // Maybe
-	DateCreated  time.Time       `json:"dateCreated"`
-	DateLastEdit time.Time       `json:"dateLastEdit"`
-	Featured     bool            `json:"featured"` // Maybe
+	ID           bson.ObjectId `json:"id" bson:"_id"`
+	OwnerID      bson.ObjectId `json:"ownerId"` // TODO: May have to also add bson tag here
+	Name         string        `json:"name"`
+	ReleaseIDs   []string      `json:"releaseIDs"`
+	Description  string        `json:"description"` // Maybe
+	DateCreated  time.Time     `json:"dateCreated"`
+	DateLastEdit time.Time     `json:"dateLastEdit"`
+	Featured     bool          `json:"featured"` // Maybe
 }
 
 type NewShelf struct {
@@ -39,7 +39,7 @@ func (ns *NewShelf) ToShelf(userID bson.ObjectId) (*Shelf, error) {
 		ID:           bson.NewObjectId(),
 		OwnerID:      userID,
 		Name:         ns.Name,
-		ReleaseIDs:   []bson.ObjectId{},
+		ReleaseIDs:   []string{},
 		Description:  ns.Description,
 		DateCreated:  time.Now(),
 		DateLastEdit: time.Now(),

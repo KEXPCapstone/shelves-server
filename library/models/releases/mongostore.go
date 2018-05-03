@@ -1,12 +1,14 @@
 package releases
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	mgo "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 // MongoStore implements LibraryStore interface
@@ -16,10 +18,11 @@ type MongoStore struct {
 	releaseCollection string
 	artistCollection  string
 	genreCollection   string
+	noteCollection    string
 }
 
 // NewMongoStore returns a new MongoStore struct with fields initialized to the passed parameters
-func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, artistCollection string, genreCollection string) *MongoStore {
+func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, artistCollection string, genreCollection string, noteCollection string) *MongoStore {
 	if sess == nil {
 		panic(NoMgoSess)
 	}
@@ -29,6 +32,7 @@ func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, a
 		releaseCollection: releaseCollection,
 		artistCollection:  artistCollection,
 		genreCollection:   genreCollection,
+		noteCollection:    noteCollection,
 	}
 }
 
@@ -106,12 +110,14 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	return t, nil
 }
 
-// GetArtists returns artists in the library greater than 'lastID'
+// GetArtists returns artists whose name is alphabetically greater than
+// 'lastID'
 // 'limit' specifies the max # of docs to return
 func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
-	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&artists); err != nil {
+	collation := &mgo.Collation{Locale: "en", Strength: 1}
+	if err := coll.Find(bson.M{"artistName": bson.M{"$gt": lastID}}).Sort("artistName").Collation(collation).Limit(limit).All(&artists); err != nil {
 		return nil, err
 	}
 	return artists, nil
@@ -146,6 +152,23 @@ func (ms *MongoStore) GetGenreByID(id bson.ObjectId) (*Genre, error) {
 		return nil, err
 	}
 	return genre, nil
+}
+
+func (ms *MongoStore) AddNoteToRelease(note *Note) (*Note, error) {
+	noteColl := ms.session.DB(ms.dbname).C(ms.noteCollection)
+	if err := noteColl.Insert(note); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrInsertNote, err)
+	}
+	release, err := ms.GetReleaseByID(note.ReleaseID)
+	if err != nil {
+		return nil, errors.New(ErrReleaseNotFound)
+	}
+	release.Notes = append(release.Notes, note.ID)
+	releaseColl := ms.session.DB(ms.dbname).C(ms.releaseCollection)
+	if err := releaseColl.UpdateId(note.ReleaseID, bson.M{"$set": release}); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrAddNoteToRelease, err)
+	}
+	return note, nil
 }
 
 // retrieves a list of all distinct artists in the library, sorted alphabetically

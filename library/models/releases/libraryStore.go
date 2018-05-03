@@ -3,7 +3,7 @@ package releases
 // TODO: general interface should be agnostic of mgo types
 import (
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 // LibraryStore provides functions for interacting with a database
@@ -37,4 +37,6 @@ type LibraryStore interface {
 	GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error)
 
 	IndexReleases() (*indexes.TrieNode, error)
+
+	AddNoteToRelease(note *Note) (*Note, error)
 }
