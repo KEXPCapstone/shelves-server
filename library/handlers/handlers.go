@@ -11,8 +11,8 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/library/models/releases"
+	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // ReleasesHandler path: /v1/library/releases
