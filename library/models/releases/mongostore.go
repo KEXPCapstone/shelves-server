@@ -106,12 +106,14 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	return t, nil
 }
 
-// GetArtists returns artists in the library greater than 'lastID'
+// GetArtists returns artists whose name is alphabetically greater than
+// 'lastID'
 // 'limit' specifies the max # of docs to return
 func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
-	if err := coll.Find(bson.M{"_id": bson.M{"$gt": lastID}}).Limit(limit).All(&artists); err != nil {
+	collation := &mgo.Collation{Locale: "en", Strength: 1}
+	if err := coll.Find(bson.M{"artistName": bson.M{"$gt": lastID}}).Sort("artistName").Collation(collation).Limit(limit).All(&artists); err != nil {
 		return nil, err
 	}
 	return artists, nil
