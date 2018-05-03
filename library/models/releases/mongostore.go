@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	mgo "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 // MongoStore implements LibraryStore interface

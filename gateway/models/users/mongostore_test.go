@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	mgo "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 // a helper function which will create a new MongoDB database

@@ -7,7 +7,7 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/shelves/handlers"
 	"github.com/KEXPCapstone/shelves-server/shelves/models"
-	mgo "gopkg.in/mgo.v2"
+	mgo "github.com/globalsign/mgo"
 )
 
 func main() {
