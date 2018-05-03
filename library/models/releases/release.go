@@ -6,7 +6,7 @@ import (
 
 	"github.com/KEXPCapstone/shelves-server/library/indexes"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 // Release represents a single release for an album in the KEXP library

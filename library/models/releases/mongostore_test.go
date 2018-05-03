@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	mgo "gopkg.in/mgo.v2"
+	mgo "github.com/globalsign/mgo"
 )
 
 // a helper function which will create a new MongoDB database

@@ -14,8 +14,8 @@ import (
 	"github.com/KEXPCapstone/shelves-server/gateway/handlers"
 	"github.com/KEXPCapstone/shelves-server/gateway/models/users"
 	"github.com/KEXPCapstone/shelves-server/gateway/sessions"
+	mgo "github.com/globalsign/mgo"
 	"github.com/go-redis/redis"
-	mgo "gopkg.in/mgo.v2"
 )
 
 func main() {

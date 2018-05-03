@@ -6,8 +6,8 @@ import (
 	"net/mail"
 	"strings"
 
+	"github.com/globalsign/mgo/bson"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var bcryptCost = 13
