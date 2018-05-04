@@ -11,3 +11,5 @@ const ErrInsertNote = "Error inserting note: "
 const ErrAddNoteToRelease = "Error adding note to release: "
 
 const ErrEmptyComment = "Comment cannot be empty."
+
+const ErrFetchingNotes = "Error fetching notes: "

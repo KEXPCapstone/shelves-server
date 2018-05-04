@@ -149,7 +149,17 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) {
-
+	releaseID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(releaseID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid release id", releaseID), http.StatusBadRequest)
+		return
+	}
+	notes, err := hCtx.libraryStore.GetNotesFromRelease(releaseID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+	respond(w, http.StatusOK, notes)
 }
 
 func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {

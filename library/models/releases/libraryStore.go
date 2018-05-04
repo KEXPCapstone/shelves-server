@@ -39,4 +39,6 @@ type LibraryStore interface {
 	IndexReleases() (*indexes.TrieNode, error)
 
 	AddNoteToRelease(note *Note) (*Note, error)
+
+	GetNotesFromRelease(id string) ([]*Note, error)
 }

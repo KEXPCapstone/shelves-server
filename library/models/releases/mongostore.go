@@ -172,7 +172,12 @@ func (ms *MongoStore) AddNoteToRelease(note *Note) (*Note, error) {
 }
 
 func (ms *MongoStore) GetNotesFromRelease(id string) ([]*Note, error) {
-
+	noteColl := ms.session.DB(ms.dbname).C(ms.noteCollection)
+	resultNotes := []*Note{}
+	if err := noteColl.Find(bson.M{"releaseID": id}).All(&resultNotes); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrFetchingNotes, err)
+	}
+	return resultNotes, nil
 }
 
 // retrieves a list of all distinct artists in the library, sorted alphabetically
