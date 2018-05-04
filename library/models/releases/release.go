@@ -43,8 +43,7 @@ type ReleaseAndMatchCriteria struct {
 }
 
 type NewNote struct {
-	Comment     string    `json:"comment"`
-	DateCreated time.Time `json:"dateCreated"`
+	Comment string `json:"comment"`
 }
 
 // Note represents a note/comment for a given release
@@ -73,7 +72,7 @@ func (nn *NewNote) ToNote(userID bson.ObjectId, releaseID string) (*Note, error)
 		OwnerID:     userID,
 		ReleaseID:   releaseID,
 		Comment:     nn.Comment,
-		DateCreated: nn.DateCreated,
+		DateCreated: time.Now(),
 	}
 	return note, nil
 }
