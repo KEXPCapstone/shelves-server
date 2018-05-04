@@ -49,10 +49,10 @@ type NewNote struct {
 // Note represents a note/comment for a given release
 type Note struct {
 	ID          bson.ObjectId `json:"id" bson:"_id"`
-	OwnerID     bson.ObjectId `json:"author"`
-	ReleaseID   string        `json:"releaseID"`
-	Comment     string        `json:"comment"`
-	DateCreated time.Time     `json:"dateCreated"`
+	OwnerID     bson.ObjectId `json:"ownerID" bson:"ownerID"`
+	ReleaseID   string        `json:"releaseID" bson:"releaseID"`
+	Comment     string        `json:"comment" bson:"comment"`
+	DateCreated time.Time     `json:"dateCreated" bson:"dateCreated"`
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
 
