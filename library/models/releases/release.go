@@ -50,6 +50,7 @@ type NewNote struct {
 type Note struct {
 	ID          bson.ObjectId `json:"id" bson:"_id"`
 	OwnerID     bson.ObjectId `json:"ownerID" bson:"ownerID"`
+	AuthorName  string        `json:"authorName" bson:"authorName"`
 	ReleaseID   string        `json:"releaseID" bson:"releaseID"`
 	Comment     string        `json:"comment" bson:"comment"`
 	DateCreated time.Time     `json:"dateCreated" bson:"dateCreated"`
@@ -63,13 +64,14 @@ func (nn *NewNote) Validate() error {
 	return nil
 }
 
-func (nn *NewNote) ToNote(userID bson.ObjectId, releaseID string) (*Note, error) {
+func (nn *NewNote) ToNote(userID bson.ObjectId, authorName string, releaseID string) (*Note, error) {
 	if err := nn.Validate(); err != nil {
 		return nil, err
 	}
 	note := &Note{
 		ID:          bson.NewObjectId(),
 		OwnerID:     userID,
+		AuthorName:  authorName,
 		ReleaseID:   releaseID,
 		Comment:     nn.Comment,
 		DateCreated: time.Now(),

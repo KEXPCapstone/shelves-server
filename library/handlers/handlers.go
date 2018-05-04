@@ -174,12 +174,16 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
-
+	authorName, err := getNameFromRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
 	if err := json.NewDecoder(r.Body).Decode(nn); err != nil {
 		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
 	}
-	note, err := nn.ToNote(userID, releaseID)
+	note, err := nn.ToNote(userID, authorName, releaseID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
@@ -190,6 +194,15 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, http.StatusCreated, insertedNote)
+}
+
+func getNameFromRequest(r *http.Request) (string, error) {
+	xUserHeader := r.Header.Get(XUser)
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return "", fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	return usr.FirstName + " " + usr.LastName, nil
 }
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
