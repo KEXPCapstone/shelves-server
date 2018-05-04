@@ -171,6 +171,10 @@ func (ms *MongoStore) AddNoteToRelease(note *Note) (*Note, error) {
 	return note, nil
 }
 
+func (ms *MongoStore) GetNotesFromRelease(id string) ([]*Note, error) {
+
+}
+
 // retrieves a list of all distinct artists in the library, sorted alphabetically
 // // TODO: refine this query
 // // > db.releases.aggregate([{$group: {_id: "$KEXPReleaseArtistCredit", releases: {$push: {id: "$_id", KEXPTitle: "$KEXPTitle", KEXPMBID: "$KEXPMBID"}}}},{$sort:{_id:1}},{$out: "artists"}],{collation:{locale: "en", strength: 1}})

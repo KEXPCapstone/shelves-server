@@ -139,10 +139,16 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		hCtx.insertNote(w, r)
+	case http.MethodGet:
+		hCtx.getReleaseNotes(w, r)
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
 	}
+
+}
+
+func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) {
 
 }
 
