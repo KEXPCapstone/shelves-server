@@ -83,8 +83,8 @@ func main() {
 	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 
-	mux.Handle("/v1/library/", UnAuthMicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
-
+	// mux.Handle("/v1/library/", UnAuthMicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
+	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 	corsHandler := handlers.NewCorsHandler(mux)
 	log.Println("Starting to redirect http traffic to https")
 	go func() {
