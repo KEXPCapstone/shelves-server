@@ -43,17 +43,17 @@ type ReleaseAndMatchCriteria struct {
 }
 
 type NewNote struct {
-	Comment     string    `json:"comment"`
-	DateCreated time.Time `json:"dateCreated"`
+	Comment string `json:"comment"`
 }
 
 // Note represents a note/comment for a given release
 type Note struct {
 	ID          bson.ObjectId `json:"id" bson:"_id"`
-	OwnerID     bson.ObjectId `json:"author"`
-	ReleaseID   string        `json:"releaseID"`
-	Comment     string        `json:"comment"`
-	DateCreated time.Time     `json:"dateCreated"`
+	OwnerID     bson.ObjectId `json:"ownerID" bson:"ownerID"`
+	AuthorName  string        `json:"authorName" bson:"authorName"`
+	ReleaseID   string        `json:"releaseID" bson:"releaseID"`
+	Comment     string        `json:"comment" bson:"comment"`
+	DateCreated time.Time     `json:"dateCreated" bson:"dateCreated"`
 	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
 
@@ -64,16 +64,17 @@ func (nn *NewNote) Validate() error {
 	return nil
 }
 
-func (nn *NewNote) ToNote(userID bson.ObjectId, releaseID string) (*Note, error) {
+func (nn *NewNote) ToNote(userID bson.ObjectId, authorName string, releaseID string) (*Note, error) {
 	if err := nn.Validate(); err != nil {
 		return nil, err
 	}
 	note := &Note{
 		ID:          bson.NewObjectId(),
 		OwnerID:     userID,
+		AuthorName:  authorName,
 		ReleaseID:   releaseID,
 		Comment:     nn.Comment,
-		DateCreated: nn.DateCreated,
+		DateCreated: time.Now(),
 	}
 	return note, nil
 }
