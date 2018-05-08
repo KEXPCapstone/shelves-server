@@ -142,6 +142,17 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	return usr.ID, nil
 }
 
+// Returns the full name of the current user.  If current user is not authenticated,
+// returns an error
+func getNameFromRequest(r *http.Request) (string, error) {
+	xUserHeader := r.Header.Get(XUser)
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return "", fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	return usr.FirstName + " " + usr.LastName, nil
+}
+
 // Given a specific user ID, get that user's shelves.
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
 	releases, err := hCtx.shelfStore.GetUserShelves(userID)
