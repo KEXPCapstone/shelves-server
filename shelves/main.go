@@ -17,10 +17,8 @@ func main() {
 	}
 	mux := http.NewServeMux()
 
-	// TODO: Register handlers on mux
 	dbAddr := os.Getenv("DBADDR")
 	if len(dbAddr) == 0 {
-		// dbAddr = "localhost:27017"
 		log.Fatal("Please provide DBADDR")
 	}
 

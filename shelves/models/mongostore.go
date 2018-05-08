@@ -12,7 +12,6 @@ type MgoStore struct {
 	session *mgo.Session
 	dbname  string
 	colname string
-	// TODO: Maybe just have a field for coll here
 }
 
 func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoStore {
@@ -69,7 +68,6 @@ func (ms *MgoStore) GetUserShelves(userId bson.ObjectId) ([]*Shelf, error) {
 	return shelves, nil
 }
 
-// TODO: Evaluate best means of updating; replacing or patching
 func (ms *MgoStore) UpdateShelf(id bson.ObjectId, replacementShelf *Shelf) error {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.UpdateId(id, replacementShelf); err != nil {
