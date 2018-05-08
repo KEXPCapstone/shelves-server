@@ -13,9 +13,6 @@ type UserStore interface {
 	//it into the database, and returns it
 	Insert(newUser *NewUser) (*User, error)
 
-	//Update applies UserUpdates to the given user ID
-	Update(id bson.ObjectId, updates *Updates) error
-
 	//Delete deletes the user with the given ID
 	Delete(id bson.ObjectId) error
 }

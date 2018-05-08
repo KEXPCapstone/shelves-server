@@ -56,21 +56,6 @@ func (ms *MgoStore) GetByEmail(email string) (*User, error) {
 	return &usr, nil
 }
 
-func (ms *MgoStore) Update(id bson.ObjectId, updates *Updates) error {
-	coll := ms.session.DB(ms.dbname).C(ms.colname)
-	usr, err := ms.GetByID(id)
-	if err != nil {
-		return err
-	}
-	if err := usr.ApplyUpdates(updates); err != nil {
-		return err
-	}
-	if err := coll.UpdateId(id, bson.M{"$set": updates}); err != nil {
-		return fmt.Errorf("%v : %v", ErrStrUpdateUser, err)
-	}
-	return nil
-}
-
 func (ms *MgoStore) Delete(id bson.ObjectId) error {
 	coll := ms.session.DB(ms.dbname).C(ms.colname)
 	if err := coll.RemoveId(id); err != nil {
