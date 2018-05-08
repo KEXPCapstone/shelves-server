@@ -26,10 +26,6 @@ func (hCtx *HandlerCtx) UsersHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Another user already has the email address: %v", nu.Email), http.StatusBadRequest)
 			return
 		}
-		if _, err := hCtx.userStore.GetByUserName(nu.UserName); err != users.ErrUserNotFound {
-			http.Error(w, fmt.Sprintf("Another user already has the user name: %v", nu.UserName), http.StatusBadRequest)
-			return
-		}
 		usr, err := hCtx.userStore.Insert(nu)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error adding user: %v", err), http.StatusInternalServerError)
