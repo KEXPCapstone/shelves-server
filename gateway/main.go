@@ -83,7 +83,6 @@ func main() {
 	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 
-	// mux.Handle("/v1/library/", UnAuthMicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
 	corsHandler := handlers.NewCorsHandler(mux)
 	log.Println("Starting to redirect http traffic to https")
@@ -99,20 +98,6 @@ func main() {
 
 func redirectTLS(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
-}
-
-func UnAuthMicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
-	index := 0
-	mx := sync.Mutex{}
-	return &httputil.ReverseProxy{
-		Director: func(r *http.Request) {
-			mx.Lock()
-			r.URL.Host = addrs[index%len(addrs)]
-			index++
-			mx.Unlock()
-			r.URL.Scheme = "http" //downgrade to http protocol
-		},
-	}
 }
 
 func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
