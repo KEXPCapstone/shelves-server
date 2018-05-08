@@ -179,6 +179,11 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
+	ownerName, err := getNameFromRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
 	if err := json.NewDecoder(r.Body).Decode(ns); err != nil {
 		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
