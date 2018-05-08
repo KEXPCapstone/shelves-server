@@ -54,7 +54,6 @@ type Note struct {
 	ReleaseID   string        `json:"releaseID" bson:"releaseID"`
 	Comment     string        `json:"comment" bson:"comment"`
 	DateCreated time.Time     `json:"dateCreated" bson:"dateCreated"`
-	// DateLastEdit time.Time     `json:"dateLastEdit"`
 }
 
 func (nn *NewNote) Validate() error {

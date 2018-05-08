@@ -148,6 +148,7 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Invoked from hCtx.NotesHandler 
 func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if _, err := uuid.Parse(releaseID); err != nil {
@@ -162,6 +163,7 @@ func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) 
 	respond(w, http.StatusOK, notes)
 }
 
+// Invoked from hCtx.NotesHandler 
 func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if _, err := uuid.Parse(releaseID); err != nil {
@@ -196,6 +198,8 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	respond(w, http.StatusCreated, insertedNote)
 }
 
+// Returns the full name of the current user.  If current user is not authenticated,
+// returns an error
 func getNameFromRequest(r *http.Request) (string, error) {
 	xUserHeader := r.Header.Get(XUser)
 	usr := &users.User{}
