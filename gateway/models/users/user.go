@@ -17,7 +17,6 @@ type User struct {
 	ID        bson.ObjectId `json:"id" bson:"_id"`
 	Email     string        `json:"email"`
 	PassHash  []byte        `json:"-"` //stored, but not encoded to clients
-	UserName  string        `json:"userName"`
 	FirstName string        `json:"firstName"`
 	LastName  string        `json:"lastName"`
 }
@@ -33,7 +32,6 @@ type NewUser struct {
 	Email        string `json:"email"`
 	Password     string `json:"password"`
 	PasswordConf string `json:"passwordConf"`
-	UserName     string `json:"userName"`
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
 }
