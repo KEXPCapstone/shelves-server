@@ -20,9 +20,6 @@ import (
 // :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
-		return
 	case http.MethodGet:
 		lastID := r.URL.Query().Get("last_id")
 		limit := r.URL.Query().Get("limit")
