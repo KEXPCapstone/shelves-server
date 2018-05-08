@@ -25,8 +25,8 @@ func NewMgoStore(sess *mgo.Session, dbName string, collectionName string) *MgoSt
 	}
 }
 
-func (ms *MgoStore) InsertNew(ns *NewShelf, userId bson.ObjectId) (*Shelf, error) {
-	shelf, err := ns.ToShelf(userId)
+func (ms *MgoStore) InsertNew(ns *NewShelf, userId bson.ObjectId, ownerName string) (*Shelf, error) {
+	shelf, err := ns.ToShelf(userId, ownerName)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ import "github.com/globalsign/mgo/bson"
 
 // TODO: Evaluate correct type of 'id' parameters
 type ShelfStore interface {
-	InsertNew(ns *NewShelf, userId bson.ObjectId) (*Shelf, error)
+	InsertNew(ns *NewShelf, userId bson.ObjectId, ownerName string) (*Shelf, error)
 
 	Insert(shelf *Shelf) (*Shelf, error)
 
