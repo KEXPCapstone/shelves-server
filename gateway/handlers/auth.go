@@ -52,7 +52,7 @@ func (hCtx *HandlerCtx) UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func (hCtx *HandlerCtx) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 	ss := &SessionState{}
-	sid, err := sessions.GetState(r, hCtx.signingKey, hCtx.sessionStore, ss)
+	_, err := sessions.GetState(r, hCtx.signingKey, hCtx.sessionStore, ss)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching current user: %v", err), http.StatusUnauthorized)
 		return
@@ -60,28 +60,8 @@ func (hCtx *HandlerCtx) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		respond(w, http.StatusOK, ss.AuthUsr)
-	case http.MethodPatch:
-		upd := &users.Updates{}
-		if err := json.NewDecoder(r.Body).Decode(upd); err != nil {
-			http.Error(w, fmt.Sprintf("Error decoding JSON into Updates: %v", err), http.StatusBadRequest)
-			return
-		}
-		if err := hCtx.userStore.Update(ss.AuthUsr.ID, upd); err != nil {
-			http.Error(w, fmt.Sprintf("Error updating user: %v", err), http.StatusBadRequest)
-			return
-		}
-		usr, err := hCtx.userStore.GetByID(ss.AuthUsr.ID) // get the newly updated user
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error fetching updated usr: %v", err), http.StatusInternalServerError)
-			return
-		}
-		if err := hCtx.sessionStore.Save(sid, &SessionState{AuthUsr: usr}); err != nil { // update sessions store
-			http.Error(w, fmt.Sprintf("Error updating session: %v", err), http.StatusInternalServerError)
-			return
-		}
-		respond(w, http.StatusOK, usr)
 	default:
-		http.Error(w, "Only allowed to GET or PATCH to this resource", http.StatusMethodNotAllowed)
+		http.Error(w, "Only allowed to GET to this resource", http.StatusMethodNotAllowed)
 		return
 	}
 }
