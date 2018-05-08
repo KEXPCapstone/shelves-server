@@ -41,9 +41,6 @@ func (nu *NewUser) Validate() error {
 	if _, err := mail.ParseAddress(nu.Email); err != nil {
 		return fmt.Errorf("%v %v", invalidEmailError, nu.Email)
 	}
-	if len(nu.UserName) == 0 {
-		return errors.New(emptyUserNameError)
-	}
 	if len(nu.FirstName) == 0 {
 		return errors.New(emptyFirstNameError)
 	}
@@ -68,7 +65,6 @@ func (nu *NewUser) ToUser() (*User, error) {
 	usr := User{
 		ID:        bson.NewObjectId(),
 		Email:     email,
-		UserName:  nu.UserName,
 		FirstName: nu.FirstName,
 		LastName:  nu.LastName,
 	}
