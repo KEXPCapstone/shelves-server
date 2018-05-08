@@ -188,7 +188,7 @@ func (hCtx *HandlerCtx) addShelf(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
 	}
-	shelf, err := hCtx.shelfStore.InsertNew(ns, userID)
+	shelf, err := hCtx.shelfStore.InsertNew(ns, userID, ownerName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
