@@ -93,13 +93,3 @@ func (u *User) Authenticate(password string) error {
 	}
 	return nil
 }
-
-// TODO: Revisit, see what updates may be relevant.
-func (u *User) ApplyUpdates(updates *Updates) error {
-	if len(updates.FirstName) == 0 || len(updates.LastName) == 0 {
-		return errors.New(invalidNameUpdate)
-	}
-	u.FirstName = updates.FirstName
-	u.LastName = updates.LastName
-	return nil
-}
