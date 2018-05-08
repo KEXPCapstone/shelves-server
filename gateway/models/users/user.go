@@ -36,11 +36,6 @@ type NewUser struct {
 	LastName     string `json:"lastName"`
 }
 
-//Updates represents allowed updates to a user profile
-type Updates struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
 
 func (nu *NewUser) Validate() error {
 	if _, err := mail.ParseAddress(nu.Email); err != nil {
