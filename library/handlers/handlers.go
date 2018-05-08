@@ -46,7 +46,7 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// SearchHandler path: /v1/library/search
+// SearchHandler path: /v1/library/releases/search
 // :param: q, the search query
 func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	searchTerm := r.URL.Query().Get("q")
