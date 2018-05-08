@@ -17,7 +17,6 @@ type User struct {
 	ID        bson.ObjectId `json:"id" bson:"_id"`
 	Email     string        `json:"email"`
 	PassHash  []byte        `json:"-"` //stored, but not encoded to clients
-	UserName  string        `json:"userName"`
 	FirstName string        `json:"firstName"`
 	LastName  string        `json:"lastName"`
 }
@@ -33,23 +32,14 @@ type NewUser struct {
 	Email        string `json:"email"`
 	Password     string `json:"password"`
 	PasswordConf string `json:"passwordConf"`
-	UserName     string `json:"userName"`
 	FirstName    string `json:"firstName"`
 	LastName     string `json:"lastName"`
 }
 
-//Updates represents allowed updates to a user profile
-type Updates struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
 
 func (nu *NewUser) Validate() error {
 	if _, err := mail.ParseAddress(nu.Email); err != nil {
 		return fmt.Errorf("%v %v", invalidEmailError, nu.Email)
-	}
-	if len(nu.UserName) == 0 {
-		return errors.New(emptyUserNameError)
 	}
 	if len(nu.FirstName) == 0 {
 		return errors.New(emptyFirstNameError)
@@ -75,7 +65,6 @@ func (nu *NewUser) ToUser() (*User, error) {
 	usr := User{
 		ID:        bson.NewObjectId(),
 		Email:     email,
-		UserName:  nu.UserName,
 		FirstName: nu.FirstName,
 		LastName:  nu.LastName,
 	}
@@ -102,15 +91,5 @@ func (u *User) Authenticate(password string) error {
 	if err := bcrypt.CompareHashAndPassword(u.PassHash, []byte(password)); err != nil {
 		return errors.New(authenticationFailure)
 	}
-	return nil
-}
-
-// TODO: Revisit, see what updates may be relevant.
-func (u *User) ApplyUpdates(updates *Updates) error {
-	if len(updates.FirstName) == 0 || len(updates.LastName) == 0 {
-		return errors.New(invalidNameUpdate)
-	}
-	u.FirstName = updates.FirstName
-	u.LastName = updates.LastName
 	return nil
 }

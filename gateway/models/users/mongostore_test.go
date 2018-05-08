@@ -27,7 +27,6 @@ func insertTestingData(ms *MgoStore) (*User, error) {
 		Email:        "test@example.com",
 		Password:     "password",
 		PasswordConf: "password",
-		UserName:     "uname",
 		FirstName:    "fname",
 		LastName:     "lname",
 	}
@@ -127,50 +126,10 @@ func TestMgoGetByEmail(t *testing.T) {
 		if err == nil && c.expectedErr {
 			t.Errorf("Case name: %v. Expected to find error but none found", c.name)
 		}
-		if !c.expectedErr && (dbUsr.UserName != usr.UserName || dbUsr.Email != usr.Email) {
+		if !c.expectedErr && (dbUsr.Email != usr.Email) {
 			t.Errorf("User in database does not match expected.  Expected: %v Found: %v", usr, dbUsr)
 		}
 	}
-}
-
-func TestMgoGetByUserName(t *testing.T) {
-	mgoStore, err := createTestingMgoStore()
-	if err != nil {
-		t.Error(err)
-	}
-	usr, err := insertTestingData(mgoStore)
-	if err != nil {
-		t.Errorf("Error inserting test user into DB: %v", err)
-	}
-	cases := []struct {
-		name        string
-		username    string
-		expectedErr bool
-	}{
-		{
-			"Valid Lookup by Email",
-			usr.UserName,
-			false,
-		},
-		{
-			"Invalid Lookup by Email",
-			"",
-			true,
-		},
-	}
-	for _, c := range cases {
-		dbUsr, err := mgoStore.GetByUserName(c.username)
-		if err != nil && !c.expectedErr {
-			t.Errorf("Case name: %v. Received unexpected error: %v", c.name, err)
-		}
-		if err == nil && c.expectedErr {
-			t.Errorf("Case name: %v. Expected to find error but none found", c.name)
-		}
-		if !c.expectedErr && (dbUsr.UserName != usr.UserName || dbUsr.Email != usr.Email) {
-			t.Errorf("User in database does not match expected.  Expected: %v Found: %v", usr, dbUsr)
-		}
-	}
-
 }
 
 func TestMgoInsert(t *testing.T) {
@@ -189,7 +148,6 @@ func TestMgoInsert(t *testing.T) {
 				Email:        "test@example.com",
 				Password:     "password",
 				PasswordConf: "password",
-				UserName:     "uname",
 				FirstName:    "fname",
 				LastName:     "lname",
 			},
@@ -201,7 +159,6 @@ func TestMgoInsert(t *testing.T) {
 				Email:        "email",
 				Password:     "pass",
 				PasswordConf: "word",
-				UserName:     "user",
 			},
 			true,
 		},
@@ -213,7 +170,7 @@ func TestMgoInsert(t *testing.T) {
 		}
 		if usr != nil { // if current case is for a valid insertion
 			dbUsr, err := mgoStore.GetByID(usr.ID)
-			if usr.Email != c.nu.Email || usr.FirstName != c.nu.FirstName || usr.LastName != c.nu.LastName || usr.UserName != c.nu.UserName {
+			if usr.Email != c.nu.Email || usr.FirstName != c.nu.FirstName || usr.LastName != c.nu.LastName {
 				t.Errorf("Returned user does not match expected. User Returned: %v New User Given: %v", usr, c.nu)
 			}
 			if err != nil && !c.expectedErr {
@@ -226,59 +183,6 @@ func TestMgoInsert(t *testing.T) {
 	}
 }
 
-func TestMgoUpdate(t *testing.T) {
-	mgoStore, err := createTestingMgoStore()
-	if err != nil {
-		t.Error(err)
-	}
-	usr, err := insertTestingData(mgoStore)
-	if err != nil {
-		t.Errorf("Error inserting test user into DB: %v", err)
-	}
-	cases := []struct {
-		name        string
-		id          bson.ObjectId
-		upd         Updates
-		expectedErr bool
-	}{
-		{
-			"Valid updates",
-			usr.ID,
-			Updates{FirstName: "fname2", LastName: "lname2"},
-			false,
-		},
-		{
-			"Invalid updates",
-			usr.ID,
-			Updates{},
-			true,
-		},
-		{
-			"Attempt to update non-existent user",
-			bson.NewObjectId(),
-			Updates{FirstName: "fname2", LastName: "lname2"},
-			true,
-		},
-	}
-	for _, c := range cases {
-		err := mgoStore.Update(c.id, &c.upd)
-		if err != nil && !c.expectedErr {
-			t.Errorf("Case name: %v. Encountered unexpected error in updating: %v", c.name, err)
-		}
-		if err == nil && c.expectedErr {
-			t.Errorf("Case name: %v. Expected error but none found", c.name)
-		}
-		if err == nil && !c.expectedErr {
-			usr, err := mgoStore.GetByID(c.id)
-			if err != nil {
-				t.Errorf("Could not find user after update. Received error: %v", err)
-			}
-			if usr.FirstName != c.upd.FirstName || usr.LastName != c.upd.LastName {
-				t.Error("User was not updated in MongoDB.")
-			}
-		}
-	}
-}
 
 func TestMgoDelete(t *testing.T) {
 	mgoStore, err := createTestingMgoStore()

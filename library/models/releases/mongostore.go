@@ -80,12 +80,14 @@ func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release
 	return releases, nil
 }
 
+// Given a slice of search results (what is stored in the release trie), return a slice 
+// ReleaseAndMatchCriteria, which includes the full release as well as the associated index information.
 func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
 	for _, match := range searchResults {
 		release, err := ms.GetReleaseByID(match.ReleaseID)
 		if err != nil {
-			return nil, err // should we return this? this would be returned in the case that the object id is in the trie but not in the db...
+			return nil, err
 		}
 		results = append(results, &ReleaseAndMatchCriteria{Release: release, IndexInfo: match})
 	}

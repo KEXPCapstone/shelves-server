@@ -142,6 +142,7 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	return usr.ID, nil
 }
 
+// Given a specific user ID, get that user's shelves.
 func (hCtx *HandlerCtx) getUsersShelvesFromID(w http.ResponseWriter, r *http.Request, userID bson.ObjectId) {
 	releases, err := hCtx.shelfStore.GetUserShelves(userID)
 	if err != nil {
