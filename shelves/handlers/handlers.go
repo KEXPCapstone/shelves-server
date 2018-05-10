@@ -18,7 +18,7 @@ func (hCtx *HandlerCtx) ShelvesMineHandler(w http.ResponseWriter, r *http.Reques
 	case http.MethodGet:
 		userID, idErr := getUserIDFromRequest(r)
 		if idErr != nil {
-			http.Error(w, fmt.Sprintf("%v", idErr), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("%v", ErrNoXUser), http.StatusUnauthorized)
 			return
 		}
 		hCtx.getUsersShelvesFromID(w, r, userID)
