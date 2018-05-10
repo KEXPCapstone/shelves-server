@@ -170,12 +170,12 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	nn := &releases.NewNote{}
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", ErrNoXUser), http.StatusUnauthorized)
 		return
 	}
 	authorName, err := getNameFromRequest(r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", ErrNoXUser), http.StatusUnauthorized)
 		return
 	}
 	if err := json.NewDecoder(r.Body).Decode(nn); err != nil {
