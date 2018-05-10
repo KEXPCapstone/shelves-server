@@ -37,3 +37,5 @@ const UserShelvesHandlerMethodNotAllowed = "Only allowed to 'GET' from this reso
 const InvalidUserID = "Invalid user ID in request URL."
 
 const FeaturedShelvesHandlerMethodNotAllowed = "Only allowed to 'GET' from this resource."
+
+const ErrNoXUser = "Invalid or no X-User header. You may have been signed out."
