@@ -101,13 +101,11 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	release := Release{}
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
-		media := release.Media[0].(bson.M)
-		for k, v := range media {
+		fmt.Println("id:", release.ID)
+		for k, v := range release.Media[0].(bson.M) {
 			if k == "tracks" {
-				tracks := v.([]interface{})
-				for _, track := range tracks {
-					typedTrack := track.(bson.M)
-					for trackKey, val := range typedTrack {
+				for _, track := range v.([]interface{}) {
+					for trackKey, val := range track.(bson.M) {
 						if trackKey == "title" {
 							fmt.Println("title:", val)
 						}
