@@ -48,13 +48,21 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 
 // SearchHandler path: /v1/library/releases/search
 // :param: q, the search query
+// :parma: limit, the number of results which should be returned
+// if no limit provided, returns number of results defined by maxSearchResults constant
 func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	searchTerm := r.URL.Query().Get("q")
 
+	limitQuery := r.URL.Query().Get("limit")
+	
+	maxResults, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		maxResults = maxSearchResults 
+	}
 	switch r.Method {
 	case http.MethodGet:
 		if len(searchTerm) != 0 {
-			hCtx.prefixSearch(w, r, searchTerm)
+			hCtx.prefixSearch(w, r, searchTerm, maxResults)
 		}
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
@@ -227,9 +235,9 @@ func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Reque
 	respond(w, http.StatusOK, releases)
 }
 
-func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string) {
+func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string, maxResults int) {
 	searchTerm = strings.ToLower(searchTerm)
-	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
+	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxResults)
 	foundReleases, err := hCtx.libraryStore.GetReleasesBySliceSearchResults(searchResults)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)
