@@ -102,17 +102,20 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
 		fmt.Println("id:", release.ID)
-		for k, v := range release.Media[0].(bson.M) {
-			if k == "tracks" {
-				for _, track := range v.([]interface{}) {
-					for trackKey, val := range track.(bson.M) {
-						if trackKey == "title" {
-							fmt.Println("title:", val)
+		for i := range release.Media {
+			for k, v := range release.Media[i].(bson.M) {
+				if k == "tracks" {
+					for _, track := range v.([]interface{}) {
+						for trackKey, val := range track.(bson.M) {
+							if trackKey == "title" {
+								fmt.Println("title:", val)
+							}
 						}
 					}
-				}
-			}			
+				}			
+			}
 		}
+		
 
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
 		t.AddToTrie(strings.ToLower(release.Date), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Date"})
