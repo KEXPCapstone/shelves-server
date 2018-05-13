@@ -80,12 +80,14 @@ func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release
 	return releases, nil
 }
 
+// Given a slice of search results (what is stored in the release trie), return a slice 
+// ReleaseAndMatchCriteria, which includes the full release as well as the associated index information.
 func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
 	for _, match := range searchResults {
 		release, err := ms.GetReleaseByID(match.ReleaseID)
 		if err != nil {
-			return nil, err // should we return this? this would be returned in the case that the object id is in the trie but not in the db...
+			return nil, err
 		}
 		results = append(results, &ReleaseAndMatchCriteria{Release: release, IndexInfo: match})
 	}
@@ -99,6 +101,19 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	release := Release{}
 	t := indexes.CreateTrieRoot()
 	for iter.Next(&release) {
+		for i := range release.Media {
+			for k, v := range release.Media[i].(bson.M) {
+				if k == "tracks" {
+					for _, track := range v.([]interface{}) {
+						for trackKey, val := range track.(bson.M) {
+							if trackKey == "title" {
+								t.AddToTrie(strings.ToLower(val.(string)), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Track Title"})
+							}
+						}
+					}
+				}			
+			}
+		}
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
 		t.AddToTrie(strings.ToLower(release.Date), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Date"})
 		t.AddToTrie(strings.ToLower(release.Title), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Title"})
@@ -169,6 +184,15 @@ func (ms *MongoStore) AddNoteToRelease(note *Note) (*Note, error) {
 		return nil, fmt.Errorf("%v %v", ErrAddNoteToRelease, err)
 	}
 	return note, nil
+}
+
+func (ms *MongoStore) GetNotesFromRelease(id string) ([]*Note, error) {
+	noteColl := ms.session.DB(ms.dbname).C(ms.noteCollection)
+	resultNotes := []*Note{}
+	if err := noteColl.Find(bson.M{"releaseID": id}).All(&resultNotes); err != nil {
+		return nil, fmt.Errorf("%v %v", ErrFetchingNotes, err)
+	}
+	return resultNotes, nil
 }
 
 // retrieves a list of all distinct artists in the library, sorted alphabetically

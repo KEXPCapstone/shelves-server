@@ -23,11 +23,13 @@ func main() {
 	if len(addr) == 0 {
 		addr = ":443"
 	}
+
 	tlsKey := os.Getenv("TLSKEY")
 	tlsCert := os.Getenv("TLSCERT")
 	if len(tlsKey) == 0 || len(tlsCert) == 0 {
 		log.Fatal("Please provide TLSKEY and TLSCERT")
 	}
+
 	sessKey := os.Getenv("SESSIONKEY")
 	if len(sessKey) == 0 {
 		log.Fatal("Please provide SESSIONKEY")
@@ -35,17 +37,14 @@ func main() {
 
 	redisAddr := os.Getenv("REDISADDR")
 	if len(redisAddr) == 0 {
-		// redisAddr = "localhost:6379"
 		log.Fatal("Please provide REDISADDR")
 	}
 
 	dbAddr := os.Getenv("DBADDR")
 	if len(dbAddr) == 0 {
-		// dbAddr = "localhost:27017"
 		log.Fatal("Please provide DBADDR")
 	}
 
-	// Commented out because of not being used yet
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: redisAddr,
 	})
@@ -78,13 +77,10 @@ func main() {
 	mux.HandleFunc("/v1/users/me", hCtx.UsersMeHandler)
 	mux.HandleFunc("/v1/sessions", hCtx.SessionsHandler)
 	mux.HandleFunc("/v1/sessions/mine", hCtx.SessionsMineHandler)
-
-	// TODO: Unsure if we need repetition with the /
 	mux.Handle("/v1/shelves", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
 	mux.Handle("/v1/shelves/", MicroServiceProxy(splitShelvesSvcAddrs, sessKey, rs))
-
-	mux.Handle("/v1/library/", UnAuthMicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
-
+	mux.Handle("/v1/library/", MicroServiceProxy(splitLibrarySvcAddrs, sessKey, rs))
+	
 	corsHandler := handlers.NewCorsHandler(mux)
 	log.Println("Starting to redirect http traffic to https")
 	go func() {
@@ -101,20 +97,6 @@ func redirectTLS(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 }
 
-func UnAuthMicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
-	index := 0
-	mx := sync.Mutex{}
-	return &httputil.ReverseProxy{
-		Director: func(r *http.Request) {
-			mx.Lock()
-			r.URL.Host = addrs[index%len(addrs)]
-			index++
-			mx.Unlock()
-			r.URL.Scheme = "http" //downgrade to http protocol
-		},
-	}
-}
-
 func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Store) *httputil.ReverseProxy {
 	index := 0
 	mx := sync.Mutex{}
@@ -124,7 +106,7 @@ func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Sto
 			_, err := sessions.GetState(r, signingKey, sessStore, sessionState)
 			if err == nil { // Add X-User header if signed in.
 				userJSON, jsonErr := json.Marshal(sessionState.AuthUsr)
-				if jsonErr != nil { // we know the user will be a json structured object, this error is unlikely to occur
+				if jsonErr != nil {
 					log.Printf("error marshalling user: %v", sessionState.AuthUsr)
 				}
 				r.Header.Add("X-User", string(userJSON))
@@ -135,7 +117,7 @@ func MicroServiceProxy(addrs []string, signingKey string, sessStore sessions.Sto
 			r.URL.Host = addrs[index%len(addrs)]
 			index++
 			mx.Unlock()
-			r.URL.Scheme = "http" //downgrade to http protocol
+			r.URL.Scheme = "http" // downgrade to http protocol
 		},
 	}
 }

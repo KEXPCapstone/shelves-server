@@ -20,9 +20,6 @@ import (
 // :param: limit, the maximum number of releases to return
 func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
-		return
 	case http.MethodGet:
 		lastID := r.URL.Query().Get("last_id")
 		limit := r.URL.Query().Get("limit")
@@ -49,15 +46,23 @@ func (hCtx *HandlerCtx) ReleasesHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// SearchHandler path: /v1/library/search
+// SearchHandler path: /v1/library/releases/search
 // :param: q, the search query
+// :parma: limit, the number of results which should be returned
+// if no limit provided, returns number of results defined by maxSearchResults constant
 func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	searchTerm := r.URL.Query().Get("q")
 
+	limitQuery := r.URL.Query().Get("limit")
+	
+	maxResults, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		maxResults = maxSearchResults 
+	}
 	switch r.Method {
 	case http.MethodGet:
 		if len(searchTerm) != 0 {
-			hCtx.prefixSearch(w, r, searchTerm)
+			hCtx.prefixSearch(w, r, searchTerm, maxResults)
 		}
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
@@ -139,6 +144,8 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		hCtx.insertNote(w, r)
+	case http.MethodGet:
+		hCtx.getReleaseNotes(w, r)
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
@@ -146,6 +153,22 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Invoked from hCtx.NotesHandler 
+func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) {
+	releaseID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(releaseID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid release id", releaseID), http.StatusBadRequest)
+		return
+	}
+	notes, err := hCtx.libraryStore.GetNotesFromRelease(releaseID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		return
+	}
+	respond(w, http.StatusOK, notes)
+}
+
+// Invoked from hCtx.NotesHandler 
 func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if _, err := uuid.Parse(releaseID); err != nil {
@@ -155,14 +178,19 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	nn := &releases.NewNote{}
 	userID, err := getUserIDFromRequest(r)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("%v", ErrNoXUser), http.StatusUnauthorized)
+		return
+	}
+	authorName, err := getNameFromRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v", ErrNoXUser), http.StatusUnauthorized)
 		return
 	}
 	if err := json.NewDecoder(r.Body).Decode(nn); err != nil {
 		http.Error(w, fmt.Sprintf("%v : %v", ErrDecodingJSON, err), http.StatusBadRequest)
 		return
 	}
-	note, err := nn.ToNote(userID, releaseID)
+	note, err := nn.ToNote(userID, authorName, releaseID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
@@ -173,6 +201,17 @@ func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, http.StatusCreated, insertedNote)
+}
+
+// Returns the full name of the current user.  If current user is not authenticated,
+// returns an error
+func getNameFromRequest(r *http.Request) (string, error) {
+	xUserHeader := r.Header.Get(XUser)
+	usr := &users.User{}
+	if err := json.Unmarshal([]byte(xUserHeader), usr); err != nil {
+		return "", fmt.Errorf("%v : %v", ErrDecodingJSON, err)
+	}
+	return usr.FirstName + " " + usr.LastName, nil
 }
 
 func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
@@ -196,9 +235,9 @@ func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Reque
 	respond(w, http.StatusOK, releases)
 }
 
-func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string) {
+func (hCtx *HandlerCtx) prefixSearch(w http.ResponseWriter, r *http.Request, searchTerm string, maxResults int) {
 	searchTerm = strings.ToLower(searchTerm)
-	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxSearchResults)
+	searchResults := hCtx.releaseTrie.SearchReleases(searchTerm, maxResults)
 	foundReleases, err := hCtx.libraryStore.GetReleasesBySliceSearchResults(searchResults)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrorSearching+"%v", err), http.StatusInternalServerError)

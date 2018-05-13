@@ -14,13 +14,11 @@ func main() {
 	addr := os.Getenv("ADDR")
 	if len(addr) == 0 {
 		addr = ":80"
-		// addr = "localhost:4001"
 	}
 	mux := http.NewServeMux()
 
 	dbAddr := os.Getenv("DBADDR")
 	if len(dbAddr) == 0 {
-		// dbAddr = "localhost:27017"
 		log.Fatal("Please provide DBADDR")
 	}
 
