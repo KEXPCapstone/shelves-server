@@ -54,10 +54,10 @@ func (hCtx *HandlerCtx) SearchHandler(w http.ResponseWriter, r *http.Request) {
 	searchTerm := r.URL.Query().Get("q")
 
 	limitQuery := r.URL.Query().Get("limit")
-	
+
 	maxResults, err := strconv.Atoi(limitQuery)
 	if err != nil {
-		maxResults = maxSearchResults 
+		maxResults = maxSearchResults
 	}
 	switch r.Method {
 	case http.MethodGet:
@@ -100,6 +100,26 @@ func (hCtx *HandlerCtx) SingleReleaseHandler(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		respond(w, http.StatusOK, release)
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+// SingleArtistHandler path: /v1/library/artists/
+func (hCtx *HandlerCtx) SingleArtistHandler(w http.ResponseWriter, r *http.Request) {
+	artistID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(artistID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid artist id", artistID), http.StatusBadRequest)
+	}
+	switch r.Method {
+	case http.MethodGet:
+		artist, err := hCtx.libraryStore.GetArtistByMBID(artistID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, artist)
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
@@ -153,7 +173,7 @@ func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Invoked from hCtx.NotesHandler 
+// Invoked from hCtx.NotesHandler
 func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if _, err := uuid.Parse(releaseID); err != nil {
@@ -168,7 +188,7 @@ func (hCtx *HandlerCtx) getReleaseNotes(w http.ResponseWriter, r *http.Request) 
 	respond(w, http.StatusOK, notes)
 }
 
-// Invoked from hCtx.NotesHandler 
+// Invoked from hCtx.NotesHandler
 func (hCtx *HandlerCtx) insertNote(w http.ResponseWriter, r *http.Request) {
 	releaseID := path.Base(r.URL.String())
 	if _, err := uuid.Parse(releaseID); err != nil {
