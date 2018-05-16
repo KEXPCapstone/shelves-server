@@ -7,3 +7,5 @@ docker-compose pull
 docker-compose up -d
 # clear out unused images
 yes | docker image prune -a
+# restart the library service (race condition workaround)
+docker restart library
