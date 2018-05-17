@@ -17,12 +17,19 @@ type MongoStore struct {
 	dbname            string
 	releaseCollection string
 	artistCollection  string
+	labelCollection   string
 	genreCollection   string
 	noteCollection    string
 }
 
 // NewMongoStore returns a new MongoStore struct with fields initialized to the passed parameters
-func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, artistCollection string, genreCollection string, noteCollection string) *MongoStore {
+func NewMongoStore(sess *mgo.Session,
+	dbName string,
+	releaseCollection string,
+	artistCollection string,
+	labelCollection string,
+	genreCollection string,
+	noteCollection string) *MongoStore {
 	if sess == nil {
 		panic(NoMgoSess)
 	}
@@ -31,6 +38,7 @@ func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, a
 		dbname:            dbName,
 		releaseCollection: releaseCollection,
 		artistCollection:  artistCollection,
+		labelCollection:   labelCollection,
 		genreCollection:   genreCollection,
 		noteCollection:    noteCollection,
 	}
@@ -80,7 +88,7 @@ func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release
 	return releases, nil
 }
 
-// Given a slice of search results (what is stored in the release trie), return a slice 
+// Given a slice of search results (what is stored in the release trie), return a slice
 // ReleaseAndMatchCriteria, which includes the full release as well as the associated index information.
 func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
@@ -111,7 +119,7 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 							}
 						}
 					}
-				}			
+				}
 			}
 		}
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
@@ -138,14 +146,37 @@ func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	return artists, nil
 }
 
-// GetArtistByMBID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
-func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
+// GetArtistByID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
+func (ms *MongoStore) GetArtistByID(id string) (*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artist := &Artist{}
 	if err := coll.FindId(id).One(artist); err != nil {
 		return nil, err
 	}
 	return artist, nil
+}
+
+// GetLabels returns labels whose name is alphabetically greater than
+// 'lastID'
+// 'limit' specifies the max # of docs to return
+func (ms *MongoStore) GetLabels(lastID string, limit int) ([]*Label, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
+	labels := []*Label{}
+	collation := &mgo.Collation{Locale: "en", Strength: 1}
+	if err := coll.Find(bson.M{"labelName": bson.M{"$gt": lastID}}).Sort("labelName").Collation(collation).Limit(limit).All(&labels); err != nil {
+		return nil, err
+	}
+	return labels, nil
+}
+
+// GetLabelByID returns a specific label matching the supplied id (MusicBrainz label MBID)
+func (ms *MongoStore) GetLabelByID(id string) (*Label, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
+	label := &Label{}
+	if err := coll.FindId(id).One(label); err != nil {
+		return nil, err
+	}
+	return label, nil
 }
 
 // GetGenres returns genres in the library greater than 'lastID'
@@ -194,30 +225,3 @@ func (ms *MongoStore) GetNotesFromRelease(id string) ([]*Note, error) {
 	}
 	return resultNotes, nil
 }
-
-// retrieves a list of all distinct artists in the library, sorted alphabetically
-// // TODO: refine this query
-// // > db.releases.aggregate([{$group: {_id: "$KEXPReleaseArtistCredit", releases: {$push: {id: "$_id", KEXPTitle: "$KEXPTitle", KEXPMBID: "$KEXPMBID"}}}},{$sort:{_id:1}},{$out: "artists"}],{collation:{locale: "en", strength: 1}})
-// func (ms *MongoStore) GetAllArtists() ([]string, error) {
-// 	db := ms.session.DB(ms.dbname)
-// 	result := []string{}
-// 	// bson.M for nested fields to be handled gracefully
-// 	pipeline := []bson.M{
-// 		bson.M{
-// 			"$group": bson.M{
-// 				"_id":           "$KEXPReleaseArtistCredit",
-// 				"totalReleases": bson.M{"$sum": 1},
-// 			},
-// 		},
-// 		bson.M{
-// 			"$sort": bson.M{"_id": 1},
-// 		},
-// 	}
-// 	collation := bson.M{"locale": "en", "strength": 1}
-// 	// using bson.D here to maintain ordering, since mongo will interpret first key as the command name
-// 	db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result)
-// 	if err := db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result); err != nil {
-// 		return nil, err
-// 	}
-// 	return result, nil
-// }
