@@ -16,14 +16,20 @@ type MongoStore struct {
 	session           *mgo.Session
 	dbname            string
 	releaseCollection string
-	labelCollection   string
 	artistCollection  string
+	labelCollection   string
 	genreCollection   string
 	noteCollection    string
 }
 
 // NewMongoStore returns a new MongoStore struct with fields initialized to the passed parameters
-func NewMongoStore(sess *mgo.Session, dbName string, releaseCollection string, artistCollection string, genreCollection string, noteCollection string) *MongoStore {
+func NewMongoStore(sess *mgo.Session,
+	dbName string,
+	releaseCollection string,
+	artistCollection string,
+	labelCollection string,
+	genreCollection string,
+	noteCollection string) *MongoStore {
 	if sess == nil {
 		panic(NoMgoSess)
 	}

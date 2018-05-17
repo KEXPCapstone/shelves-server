@@ -154,6 +154,54 @@ func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SingleLabelHandler path: /v1/library/labels/
+func (hCtx *HandlerCtx) SingleLabelHandler(w http.ResponseWriter, r *http.Request) {
+	labelID := path.Base(r.URL.String())
+	if _, err := uuid.Parse(labelID); err != nil {
+		http.Error(w, fmt.Sprintf("'%v' is not a valid label id", labelID), http.StatusBadRequest)
+	}
+	switch r.Method {
+	case http.MethodGet:
+		label, err := hCtx.libraryStore.GetLabelByMBID(labelID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, label)
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+// LabelsHandler path: /v1/library/labels
+// :param: last_id, the id of the last label (string label name)
+// :param: limit, the max number of labels to return
+func (hCtx *HandlerCtx) LabelsHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		lastID := r.URL.Query().Get("last_id")
+		limit := r.URL.Query().Get("limit")
+
+		intLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			// for now this is a 500
+			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
+			return
+		}
+		releases, err := hCtx.libraryStore.GetLabels(lastID, intLimit)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Could not get labels: %v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, releases)
+
+	default:
+		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 // GenresHandler path: /v1/library/genres
 func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 	return
