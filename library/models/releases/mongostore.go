@@ -16,6 +16,7 @@ type MongoStore struct {
 	session           *mgo.Session
 	dbname            string
 	releaseCollection string
+	labelCollection   string
 	artistCollection  string
 	genreCollection   string
 	noteCollection    string
@@ -80,7 +81,7 @@ func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release
 	return releases, nil
 }
 
-// Given a slice of search results (what is stored in the release trie), return a slice 
+// Given a slice of search results (what is stored in the release trie), return a slice
 // ReleaseAndMatchCriteria, which includes the full release as well as the associated index information.
 func (ms *MongoStore) GetReleasesBySliceSearchResults(searchResults []indexes.SearchResult) ([]*ReleaseAndMatchCriteria, error) {
 	results := []*ReleaseAndMatchCriteria{}
@@ -111,7 +112,7 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 							}
 						}
 					}
-				}			
+				}
 			}
 		}
 		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
@@ -146,6 +147,29 @@ func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
 		return nil, err
 	}
 	return artist, nil
+}
+
+// Getlabels returns labels whose name is alphabetically greater than
+// 'lastID'
+// 'limit' specifies the max # of docs to return
+func (ms *MongoStore) Getlabels(lastID string, limit int) ([]*Label, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
+	labels := []*Label{}
+	collation := &mgo.Collation{Locale: "en", Strength: 1}
+	if err := coll.Find(bson.M{"labelName": bson.M{"$gt": lastID}}).Sort("labelName").Collation(collation).Limit(limit).All(&labels); err != nil {
+		return nil, err
+	}
+	return labels, nil
+}
+
+// GetlabelByMBID returns a specific label matching the supplied id (MusicBrainz label MBID)
+func (ms *MongoStore) GetlabelByMBID(id string) (*Label, error) {
+	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
+	label := &Label{}
+	if err := coll.FindId(id).One(label); err != nil {
+		return nil, err
+	}
+	return label, nil
 }
 
 // GetGenres returns genres in the library greater than 'lastID'
