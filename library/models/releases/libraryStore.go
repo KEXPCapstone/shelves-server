@@ -28,6 +28,12 @@ type LibraryStore interface {
 	// return a specific artist with the supplied musicbrainz artist MBID
 	GetArtistByMBID(id string) (*Artist, error)
 
+	// return all artists in the library
+	GetLabels(lastID string, limit int) ([]*Label, error)
+
+	// return a specific label with the supplied musicbrainz label MBID
+	GetLabelByMBID(id string) (*Label, error)
+
 	// return all genres in the library
 	GetGenres(lastID bson.ObjectId, limit int) ([]*Genre, error)
 
