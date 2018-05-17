@@ -50,6 +50,7 @@ services:
       - RELEASEDB=library
       - RELEASECOLL=releases
       - ARTISTCOLL=artists
+      - LABELCOLL=labels
       - GENRECOLL=genres
       - NOTECOLL=notes
     networks:

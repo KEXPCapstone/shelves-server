@@ -34,6 +34,10 @@ func main() {
 	if len(artistColl) == 0 {
 		log.Fatal("Please provide ARTISTCOLL")
 	}
+	labelColl := os.Getenv("LABELCOLL")
+	if len(labelColl) == 0 {
+		log.Fatal("Please provide LABELCOLL")
+	}
 	genreColl := os.Getenv("GENRECOLL")
 	if len(genreColl) == 0 {
 		log.Fatal("Please provide GENRECOLL")
@@ -47,7 +51,7 @@ func main() {
 		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, genreColl, noteColl)
+	mongoStore := releases.NewMongoStore(mongoSess, releaseDb, releaseColl, artistColl, labelColl, genreColl, noteColl)
 
 	releaseTrie, err := mongoStore.IndexReleases()
 	if err != nil {
@@ -62,6 +66,8 @@ func main() {
 	mux.HandleFunc("/v1/library/releases/", hCtx.SingleReleaseHandler)
 	mux.HandleFunc("/v1/library/artists", hCtx.ArtistsHandler)
 	mux.HandleFunc("/v1/library/artists/", hCtx.SingleArtistHandler)
+	mux.HandleFunc("/v1/library/labels", hCtx.LabelsHandler)
+	mux.HandleFunc("/v1/library/labels/", hCtx.SingleLabelHandler)
 	mux.HandleFunc("/v1/library/genres", hCtx.GenresHandler)
 	mux.HandleFunc("/v1/library/notes/releases/", hCtx.NotesHandler)
 
