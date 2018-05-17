@@ -18,9 +18,10 @@ func createTestingMgoStore() (*MongoStore, error) {
 	dbname := "library"
 	releaseCol := "releases"
 	artistCol := "artists"
+	labelCol := "labels"
 	genreCol := "genres"
 	noteCol := "notes"
-	ms := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol, noteCol)
+	ms := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, labelCol, genreCol, noteCol)
 	return ms, nil
 }
 
@@ -28,6 +29,7 @@ func TestNewMongoStore(t *testing.T) {
 	dbname := "library"
 	releaseCol := "releases"
 	artistCol := "artists"
+	labelCol := "labels"
 	genreCol := "genres"
 	noteCol := "notes"
 
@@ -35,7 +37,7 @@ func TestNewMongoStore(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error dialing mongodb: %v", err)
 	}
-	libraryStore := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, genreCol, noteCol)
+	libraryStore := NewMongoStore(mongoSess, dbname, releaseCol, artistCol, labelCol, genreCol, noteCol)
 	if libraryStore.session != mongoSess {
 		t.Errorf("Error setting session. Expected: '%v', Actual: '%v'", mongoSess, libraryStore.session)
 	}
@@ -64,7 +66,7 @@ func TestNewMongoStoreNilSession(t *testing.T) {
 		}
 	}()
 	// this call should cause panic() to be caught by the defer above
-	_ = NewMongoStore(nil, "foo", "bar", "baz", "bip", "woop")
+	_ = NewMongoStore(nil, "foo", "bar", "baz", "bop", "bip", "woop")
 }
 
 func TestAddRelease(t *testing.T) {
