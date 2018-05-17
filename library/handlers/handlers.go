@@ -114,7 +114,7 @@ func (hCtx *HandlerCtx) SingleArtistHandler(w http.ResponseWriter, r *http.Reque
 	}
 	switch r.Method {
 	case http.MethodGet:
-		artist, err := hCtx.libraryStore.GetArtistByMBID(artistID)
+		artist, err := hCtx.libraryStore.GetArtistByID(artistID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
 			return
@@ -162,7 +162,7 @@ func (hCtx *HandlerCtx) SingleLabelHandler(w http.ResponseWriter, r *http.Reques
 	}
 	switch r.Method {
 	case http.MethodGet:
-		label, err := hCtx.libraryStore.GetLabelByMBID(labelID)
+		label, err := hCtx.libraryStore.GetLabelByID(labelID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
 			return
@@ -207,7 +207,7 @@ func (hCtx *HandlerCtx) GenresHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// /v1/library/notes/releases/{id}
+// NotesHandler path: /v1/library/notes/releases/{id}
 func (hCtx *HandlerCtx) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:

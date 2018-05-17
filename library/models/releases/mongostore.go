@@ -145,8 +145,8 @@ func (ms *MongoStore) GetArtists(lastID string, limit int) ([]*Artist, error) {
 	return artists, nil
 }
 
-// GetArtistByMBID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
-func (ms *MongoStore) GetArtistByMBID(id string) (*Artist, error) {
+// GetArtistByID returns a specific artist matching the supplied id (MusicBrainz artist MBID)
+func (ms *MongoStore) GetArtistByID(id string) (*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artist := &Artist{}
 	if err := coll.FindId(id).One(artist); err != nil {
@@ -168,8 +168,8 @@ func (ms *MongoStore) Getlabels(lastID string, limit int) ([]*Label, error) {
 	return labels, nil
 }
 
-// GetlabelByMBID returns a specific label matching the supplied id (MusicBrainz label MBID)
-func (ms *MongoStore) GetlabelByMBID(id string) (*Label, error) {
+// GetlabelByID returns a specific label matching the supplied id (MusicBrainz label MBID)
+func (ms *MongoStore) GetlabelByID(id string) (*Label, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
 	label := &Label{}
 	if err := coll.FindId(id).One(label); err != nil {
@@ -224,30 +224,3 @@ func (ms *MongoStore) GetNotesFromRelease(id string) ([]*Note, error) {
 	}
 	return resultNotes, nil
 }
-
-// retrieves a list of all distinct artists in the library, sorted alphabetically
-// // TODO: refine this query
-// // > db.releases.aggregate([{$group: {_id: "$KEXPReleaseArtistCredit", releases: {$push: {id: "$_id", KEXPTitle: "$KEXPTitle", KEXPMBID: "$KEXPMBID"}}}},{$sort:{_id:1}},{$out: "artists"}],{collation:{locale: "en", strength: 1}})
-// func (ms *MongoStore) GetAllArtists() ([]string, error) {
-// 	db := ms.session.DB(ms.dbname)
-// 	result := []string{}
-// 	// bson.M for nested fields to be handled gracefully
-// 	pipeline := []bson.M{
-// 		bson.M{
-// 			"$group": bson.M{
-// 				"_id":           "$KEXPReleaseArtistCredit",
-// 				"totalReleases": bson.M{"$sum": 1},
-// 			},
-// 		},
-// 		bson.M{
-// 			"$sort": bson.M{"_id": 1},
-// 		},
-// 	}
-// 	collation := bson.M{"locale": "en", "strength": 1}
-// 	// using bson.D here to maintain ordering, since mongo will interpret first key as the command name
-// 	db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result)
-// 	if err := db.Run(bson.D{{"aggregate", "releases"}, {"pipeline", pipeline}, {"collation", collation}}, &result); err != nil {
-// 		return nil, err
-// 	}
-// 	return result, nil
-// }
