@@ -38,6 +38,7 @@ func NewMongoStore(sess *mgo.Session,
 		dbname:            dbName,
 		releaseCollection: releaseCollection,
 		artistCollection:  artistCollection,
+		labelCollection:   labelCollection,
 		genreCollection:   genreCollection,
 		noteCollection:    noteCollection,
 	}
@@ -155,10 +156,10 @@ func (ms *MongoStore) GetArtistByID(id string) (*Artist, error) {
 	return artist, nil
 }
 
-// Getlabels returns labels whose name is alphabetically greater than
+// GetLabels returns labels whose name is alphabetically greater than
 // 'lastID'
 // 'limit' specifies the max # of docs to return
-func (ms *MongoStore) Getlabels(lastID string, limit int) ([]*Label, error) {
+func (ms *MongoStore) GetLabels(lastID string, limit int) ([]*Label, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
 	labels := []*Label{}
 	collation := &mgo.Collation{Locale: "en", Strength: 1}
@@ -168,8 +169,8 @@ func (ms *MongoStore) Getlabels(lastID string, limit int) ([]*Label, error) {
 	return labels, nil
 }
 
-// GetlabelByID returns a specific label matching the supplied id (MusicBrainz label MBID)
-func (ms *MongoStore) GetlabelByID(id string) (*Label, error) {
+// GetLabelByID returns a specific label matching the supplied id (MusicBrainz label MBID)
+func (ms *MongoStore) GetLabelByID(id string) (*Label, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
 	label := &Label{}
 	if err := coll.FindId(id).One(label); err != nil {

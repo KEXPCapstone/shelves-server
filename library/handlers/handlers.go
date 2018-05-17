@@ -164,7 +164,7 @@ func (hCtx *HandlerCtx) SingleLabelHandler(w http.ResponseWriter, r *http.Reques
 	case http.MethodGet:
 		label, err := hCtx.libraryStore.GetLabelByID(labelID)
 		if err != nil {
-			http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Could not get label: %v", err), http.StatusInternalServerError)
 			return
 		}
 		respond(w, http.StatusOK, label)
