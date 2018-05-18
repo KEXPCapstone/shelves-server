@@ -29,7 +29,7 @@ type LibraryStore interface {
 	GetArtistByID(id string) (*Artist, error)
 
 	// return all artists in the library
-	GetLabels(lastID string, limit int) ([]*Label, error)
+	GetLabels(group string, start string, limit int) ([]*Label, error)
 
 	// return a specific label with the supplied musicbrainz label MBID
 	GetLabelByID(id string) (*Label, error)

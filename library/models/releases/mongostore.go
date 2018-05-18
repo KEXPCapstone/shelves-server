@@ -158,16 +158,18 @@ func (ms *MongoStore) GetArtistByID(id string) (*Artist, error) {
 	return artist, nil
 }
 
-// GetLabels returns labels whose name is alphabetically greater than
-// 'lastID'
-// 'limit' specifies the max # of docs to return
-func (ms *MongoStore) GetLabels(lastID string, limit int) ([]*Label, error) {
+// GetLabels returns 'limit' number of labels whose name starts with 'group' letter
+// and is alphabetically greater than 'start'
+func (ms *MongoStore) GetLabels(group string, start string, limit int) ([]*Label, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.labelCollection)
 	labels := []*Label{}
 	collation := &mgo.Collation{Locale: "en", Strength: 1}
-	if err := coll.Find(bson.M{"labelName": bson.M{"$gt": lastID}}).Sort("labelName").Collation(collation).Limit(limit).All(&labels); err != nil {
+	regex := fmt.Sprintf("^%v", group)
+	log.Printf("regex: %v", regex)
+	if err := coll.Find(bson.M{"labelName": bson.M{"$regex": bson.RegEx{regex, "i"}, "$gt": start}}).Collation(collation).Sort("labelName").Limit(limit).All(&labels); err != nil {
 		return nil, err
 	}
+	log.Printf("found %v labels", len(labels))
 	return labels, nil
 }
 
