@@ -23,13 +23,13 @@ type LibraryStore interface {
 	GetReleasesByField(field string, value string) ([]*Release, error)
 
 	// return all artists in the library
-	GetArtists(lastID string, limit int) ([]*Artist, error)
+	GetArtists(group string, start string, limit int) ([]*Artist, error)
 
 	// return a specific artist with the supplied musicbrainz artist MBID
 	GetArtistByID(id string) (*Artist, error)
 
 	// return all artists in the library
-	GetLabels(lastID string, limit int) ([]*Label, error)
+	GetLabels(group string, start string, limit int) ([]*Label, error)
 
 	// return a specific label with the supplied musicbrainz label MBID
 	GetLabelByID(id string) (*Label, error)
