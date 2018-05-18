@@ -133,13 +133,15 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 	return t, nil
 }
 
-// GetArtists returns 'limit' number of artists whose name falls within the range of
-// 'start' and 'end'
-func (ms *MongoStore) GetArtists(start string, end string, limit int) ([]*Artist, error) {
+// GetArtists returns 'limit' number of artists whose name starts with 'group' letter
+// and is alphabetically greater than 'start'
+func (ms *MongoStore) GetArtists(group string, start string, limit int) ([]*Artist, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.artistCollection)
 	artists := []*Artist{}
 	collation := &mgo.Collation{Locale: "en", Strength: 1}
-	if err := coll.Find(bson.M{"artistName": bson.M{"$gt": start, "$lt": end}}).Collation(collation).Sort("artistName").Collation(collation).Limit(limit).All(&artists); err != nil {
+	regex := fmt.Sprintf("^%v", group)
+	log.Printf("regex: %v", regex)
+	if err := coll.Find(bson.M{"artistName": bson.M{"$regex": bson.RegEx{regex, "i"}, "$gt": start}}).Collation(collation).Sort("artistName").Limit(limit).All(&artists); err != nil {
 		return nil, err
 	}
 	log.Printf("found %v artists", len(artists))

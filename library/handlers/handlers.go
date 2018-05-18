@@ -134,9 +134,9 @@ func (hCtx *HandlerCtx) SingleArtistHandler(w http.ResponseWriter, r *http.Reque
 func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		group := r.URL.Query().Get("group")
 		start := r.URL.Query().Get("start")
-		end := r.URL.Query().Get("end")
-		log.Printf("start: %v end: %v", start, end)
+		log.Printf("group: %v start: %v", group, start)
 		limit := r.URL.Query().Get("limit")
 
 		intLimit, err := strconv.Atoi(limit)
@@ -145,7 +145,7 @@ func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
 			return
 		}
-		releases, err := hCtx.libraryStore.GetArtists(start, end, intLimit)
+		releases, err := hCtx.libraryStore.GetArtists(group, start, intLimit)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Could not get artists: %v", err), http.StatusInternalServerError)
 			return
