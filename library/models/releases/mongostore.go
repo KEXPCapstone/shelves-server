@@ -115,16 +115,16 @@ func (ms *MongoStore) IndexReleases() (*indexes.TrieNode, error) {
 					for _, track := range v.([]interface{}) {
 						for trackKey, val := range track.(bson.M) {
 							if trackKey == "title" {
-								t.AddToTrie(strings.ToLower(val.(string)), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Track Title"})
+								t.AddToTrie(strings.ToLower(val.(string)), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Track Title", MatchValue: val.(string)})
 							}
 						}
 					}
 				}
 			}
 		}
-		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit"})
-		t.AddToTrie(strings.ToLower(release.Date), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Date"})
-		t.AddToTrie(strings.ToLower(release.Title), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Title"})
+		t.AddToTrie(strings.ToLower(release.KEXPReleaseArtistCredit), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "KEXPReleaseArtistCredit", MatchValue: release.KEXPReleaseArtistCredit})
+		t.AddToTrie(strings.ToLower(release.Date), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Date", MatchValue: release.Date})
+		t.AddToTrie(strings.ToLower(release.Title), indexes.SearchResult{ReleaseID: release.ID, FieldMatchedOn: "Title", MatchValue: release.Title})
 	}
 
 	if err := iter.Close(); err != nil {
