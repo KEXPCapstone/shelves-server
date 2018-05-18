@@ -18,6 +18,7 @@ type TrieNode struct {
 type SearchResult struct {
 	ReleaseID      string `json:"releaseID"`
 	FieldMatchedOn string `json:"fieldMatchedOn"`
+	MatchValue     string `json:"matchValue"`
 }
 
 func CreateTrieRoot() *TrieNode {
