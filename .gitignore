@@ -4,3 +4,4 @@ cover.out
 data/
 *deploy_key
 *deploy_key.pub
+.DS_STORE
