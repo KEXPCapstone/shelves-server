@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -127,12 +128,15 @@ func (hCtx *HandlerCtx) SingleArtistHandler(w http.ResponseWriter, r *http.Reque
 }
 
 // ArtistsHandler path: /v1/library/artists
-// :param: last_id, the id of the last artist (string artist name)
+// :param: start, the name of the first artist (string artist name)
+// :param: end, the name of the last artist (string artist name)
 // :param: limit, the max number of artists to return
 func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		lastID := r.URL.Query().Get("last_id")
+		start := r.URL.Query().Get("start")
+		end := r.URL.Query().Get("end")
+		log.Printf("start: %v end: %v", start, end)
 		limit := r.URL.Query().Get("limit")
 
 		intLimit, err := strconv.Atoi(limit)
@@ -141,7 +145,7 @@ func (hCtx *HandlerCtx) ArtistsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
 			return
 		}
-		releases, err := hCtx.libraryStore.GetArtists(lastID, intLimit)
+		releases, err := hCtx.libraryStore.GetArtists(start, end, intLimit)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Could not get artists: %v", err), http.StatusInternalServerError)
 			return
