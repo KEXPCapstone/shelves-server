@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"errors"
 	"time"
 
@@ -12,7 +13,7 @@ type Shelf struct {
 	OwnerID      bson.ObjectId `json:"ownerId"`
 	OwnerName 	 string 	   `json:"ownerName"`
 	Name         string        `json:"name"`
-	ReleaseIDs   []string      `json:"releaseIDs"`
+	Releases   	 []*releases.Release      `json:"releases"`
 	Description  string        `json:"description"` // Maybe
 	DateCreated  time.Time     `json:"dateCreated"`
 	DateLastEdit time.Time     `json:"dateLastEdit"`
@@ -41,7 +42,7 @@ func (ns *NewShelf) ToShelf(userID bson.ObjectId, ownerName string) (*Shelf, err
 		OwnerID:      userID,
 		OwnerName: 	  ownerName,
 		Name:         ns.Name,
-		ReleaseIDs:   []string{},
+		Releases:   []*releases.Release{},
 		Description:  ns.Description,
 		DateCreated:  time.Now(),
 		DateLastEdit: time.Now(),
