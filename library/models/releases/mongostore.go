@@ -83,7 +83,7 @@ func (ms *MongoStore) GetReleasesByField(field string, value string, start strin
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
 	collation := &mgo.Collation{Locale: "en", Strength: 1}
-	if err := coll.Find(bson.M{field: value, bson.M{"title": "$gt": start}}).Collation(collation).Sort(field).Limit(limit).All(&releases); err != nil {
+	if err := coll.Find(bson.M{field: value, "title": bson.M{"$gt": start}}).Collation(collation).Sort(field).Limit(limit).All(&releases); err != nil {
 		return nil, err
 	}
 	return releases, nil
