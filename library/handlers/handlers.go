@@ -83,6 +83,11 @@ func (hCtx *HandlerCtx) RelatedReleasesHandler(w http.ResponseWriter, r *http.Re
 		start := r.URL.Query().Get("start")
 		limit := r.URL.Query().Get("limit")
 		intLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			// for now this is a 500
+			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
+			return
+		}
 		hCtx.findReleasesByField(w, r, field, value, start, intLimit)
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
