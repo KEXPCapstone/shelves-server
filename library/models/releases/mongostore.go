@@ -79,10 +79,11 @@ func (ms *MongoStore) GetReleaseByID(id string) (*Release, error) {
 
 // GetReleasesByField accepts a pairing of a field key and value
 // returning a slice of releases where release.field['value'] matches the passed params
-func (ms *MongoStore) GetReleasesByField(field string, value string) ([]*Release, error) {
+func (ms *MongoStore) GetReleasesByField(field string, value string, start string, limit int) ([]*Release, error) {
 	coll := ms.session.DB(ms.dbname).C(ms.releaseCollection)
 	releases := []*Release{}
-	if err := coll.Find(bson.M{field: value}).All(&releases); err != nil {
+	collation := &mgo.Collation{Locale: "en", Strength: 1}
+	if err := coll.Find(bson.M{field: value, bson.M{"title": "$gt": start}}).Collation(collation).Sort(field).Limit(limit).All(&releases); err != nil {
 		return nil, err
 	}
 	return releases, nil

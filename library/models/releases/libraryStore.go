@@ -20,7 +20,7 @@ type LibraryStore interface {
 	GetReleaseByID(id string) (*Release, error)
 
 	// return a slice of releases matching the given field value
-	GetReleasesByField(field string, value string) ([]*Release, error)
+	GetReleasesByField(field string, value string, start string, limit int) ([]*Release, error)
 
 	// return all artists in the library
 	GetArtists(group string, start string, limit int) ([]*Artist, error)
