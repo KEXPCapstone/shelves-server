@@ -80,7 +80,15 @@ func (hCtx *HandlerCtx) RelatedReleasesHandler(w http.ResponseWriter, r *http.Re
 	case http.MethodGet:
 		field := r.URL.Query().Get("field")
 		value := r.URL.Query().Get("value")
-		hCtx.findReleasesByField(w, r, field, value)
+		start := r.URL.Query().Get("start")
+		limit := r.URL.Query().Get("limit")
+		intLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			// for now this is a 500
+			http.Error(w, fmt.Sprintf("Could not convert 'limit' param value '%v' to integer", limit), http.StatusInternalServerError)
+			return
+		}
+		hCtx.findReleasesByField(w, r, field, value, start, intLimit)
 	default:
 		http.Error(w, fmt.Sprintf(HandlerInvalidMethod, r.Method), http.StatusMethodNotAllowed)
 		return
@@ -300,8 +308,8 @@ func getUserIDFromRequest(r *http.Request) (bson.ObjectId, error) {
 	return usr.ID, nil
 }
 
-func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string) {
-	releases, err := hCtx.libraryStore.GetReleasesByField(field, value)
+func (hCtx *HandlerCtx) findReleasesByField(w http.ResponseWriter, r *http.Request, field string, value string, start string, limit int) {
+	releases, err := hCtx.libraryStore.GetReleasesByField(field, value, start, limit)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(ErrFetchingRelease+"%v", err), http.StatusBadRequest)
 		return
