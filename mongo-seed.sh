@@ -6,7 +6,7 @@ mongoimport --host mongodb --db library --collection releases --type json -v --f
 echo "creating artists collection from release data"
 mongo mongodb/library --eval 'db.releases.aggregate([{$group:{_id:"$KEXPReleaseGroupMBID",artist:{$first:{$arrayElemAt:["$artist-credit",0]}},title:{$first:"$KEXPTitle"},releases:{$push:{id:"$_id",title:"$KEXPTitle",coverArtArchive: "$cover-art-archive",asin: "$asin"}}}},{$group:{_id:"$artist.artist.id",artistName:{$first:"$artist.artist.name"},artistSortName:{$first:"$artist.artist.sort-name"},disambiguation:{$first:"$artist.artist.disambiguation"},releaseGroups:{$push:{releaseGroupId:"$_id",title:"$title",releases:"$releases"}}}},{$sort:{_id:1}},{$out:"artists"}],{allowDiskUse: true,collation:{locale:"en",strength:1}})'
 echo "creating labels collection from release data"
-mongo mongodb/library --eval 'db.releases.aggregate([{$addFields:{label:{$arrayElemAt:["$label-info",0]},artist:{$arrayElemAt:["$artist-credit",0]}}},{$group:{_id:"$label.label.id",labelName:{$first:"$label.label.name"},disambiguation:{$first:"$label.label.disambiguation"},releases:{$push:{releaseID:"$_id",releaseGroupID:"$KEXPReleaseGroupMBID",title:"$title",artistName:"$artist.name",artistID:"$artist.artist.id",catalogNumber:"$label.catalog-number"}}},},{$out:"labels"}])'
+mongo mongodb/library --eval 'db.releases.aggregate([{$addFields:{label:{$arrayElemAt:["$label-info",0]},artist:{$arrayElemAt:["$artist-credit",0]}}},{$group:{_id:"$label.label.id",labelName:{$first:"$label.label.name"},disambiguation:{$first:"$label.label.disambiguation"},releases:{$push:{releaseID:"$_id",releaseGroupID:"$KEXPReleaseGroupMBID",title:"$title",artistName:"$artist.name",artistID:"$artist.artist.id",catalogNumber:"$label.catalog-number",asin: "$asin"}}},},{$out:"labels"}])'
 
 # mongo aggregate
 # (same as above, but for readability)
@@ -89,7 +89,8 @@ mongo mongodb/library --eval 'db.releases.aggregate([{$addFields:{label:{$arrayE
 #                         title: "$title",
 #                         artistName: "$artist.name",
 #                         artistID: "$artist.artist.id",
-#                         catalogNumber: "$label.catalog-number"
+#                         catalogNumber: "$label.catalog-number",
+#                         asin: "$asin"
 #                     }
 #                 }
 #             },
