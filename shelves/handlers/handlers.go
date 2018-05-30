@@ -102,6 +102,23 @@ func (hCtx *HandlerCtx) FeaturedShelvesHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
+// /v1/shelves/search/{id}
+func (hCtx *HandlerCtx) ShelvesForReleaseHandler(w http.ResponseWriter, r *http.Request) {
+	releaseID := path.Base(r.URL.String())
+	switch r.Method {
+	case http.MethodGet:
+		shelves, err := hCtx.shelfStore.GetShelvesContainingRelease(releaseID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK, shelves)
+	default:
+		http.Error(w, fmt.Sprintf("HTTP Method: %v is not allowed for this resource", r.Method), http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 /***
 	HELPER METHODS
 ***/

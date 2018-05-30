@@ -1,23 +1,24 @@
 package models
 
 import (
-	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 	"errors"
 	"time"
+
+	"github.com/KEXPCapstone/shelves-server/library/models/releases"
 
 	"github.com/globalsign/mgo/bson"
 )
 
 type Shelf struct {
-	ID           bson.ObjectId `json:"id" bson:"_id"`
-	OwnerID      bson.ObjectId `json:"ownerId"`
-	OwnerName 	 string 	   `json:"ownerName"`
-	Name         string        `json:"name"`
-	Releases   	 []*releases.Release      `json:"releases"`
-	Description  string        `json:"description"` // Maybe
-	DateCreated  time.Time     `json:"dateCreated"`
-	DateLastEdit time.Time     `json:"dateLastEdit"`
-	Featured     bool          `json:"featured"`
+	ID           bson.ObjectId       `json:"id" bson:"_id"`
+	OwnerID      bson.ObjectId       `json:"ownerId"`
+	OwnerName    string              `json:"ownerName"`
+	Name         string              `json:"name"`
+	Releases     []*releases.Release `json:"releases"`
+	Description  string              `json:"description"` // Maybe
+	DateCreated  time.Time           `json:"dateCreated"`
+	DateLastEdit time.Time           `json:"dateLastEdit"`
+	Featured     bool                `json:"featured"`
 }
 
 type NewShelf struct {
@@ -40,9 +41,9 @@ func (ns *NewShelf) ToShelf(userID bson.ObjectId, ownerName string) (*Shelf, err
 	shelf := Shelf{
 		ID:           bson.NewObjectId(),
 		OwnerID:      userID,
-		OwnerName: 	  ownerName,
+		OwnerName:    ownerName,
 		Name:         ns.Name,
-		Releases:   []*releases.Release{},
+		Releases:     []*releases.Release{},
 		Description:  ns.Description,
 		DateCreated:  time.Now(),
 		DateLastEdit: time.Now(),
