@@ -16,6 +16,9 @@ type ShelfStore interface {
 	// "GET /v1/shelves/{id}"
 	GetShelfById(id bson.ObjectId) (*Shelf, error)
 
+	// "GET /v1/shelves/search/{id}"
+	GetShelvesContainingRelease(id string) ([]*Shelf, error)
+
 	// "PUT /v1/shelves/{id}"
 	UpdateShelf(id bson.ObjectId, replacementShelf *Shelf) error
 
