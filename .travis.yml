@@ -19,7 +19,7 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: chmod 600 shelves_deploy_key && ssh -vvv -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
-      -i ./shelves_deploy_key root@104.131.43.177 ./deploy.sh
+      -i ./shelves_deploy_key root@142.93.29.243 ./deploy.sh
     on:
       branch: master
 env:
